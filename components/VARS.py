@@ -2,3 +2,12 @@ class COLOR:
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
     AL_BLUE = (0, 0, 255)
+
+
+
+MARGIN = 5
+MARGINLEFT = 10
+MARGINRIGHT = 10
+
+VCENTER = 0
+HCENTER = 0
