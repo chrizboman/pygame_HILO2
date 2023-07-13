@@ -6,6 +6,8 @@ from components.FONTS import *
 from components.VARS import *
 from components.PData import Prompt, ImportCalories
 
+from EventHandler import EventManager, userEvent, gameState
+
 import tween
 
 COLOR.AL_BLUE
@@ -15,20 +17,13 @@ HEIGHT = 1080//2
 
 
 
-@dataclass
-class gameState:
-    INIT = 0
-    START = 1
-    RUNNING = 2
-    GAMEOVER = 3
-    ANIMATING = 4
-    PAUSED = 5
-    QUIT = 6
 
 pygame.init()
 
-class Game:
+class GameManager:
     active = True
+    gameSession = None
+    eventManager = EventManager()
     
     dt = 0
     clock = pygame.time.Clock()
@@ -51,28 +46,29 @@ class Game:
 
     
     def HandleEvents(self):
-        for event in pygame.event.get(): 
-            if event.type == pygame.QUIT:
-                self.active = False
-                self.gameState = gameState.QUIT
-                quit()
+        event = self.eventManager.CheckForInput(self.gameState)
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_a:
-                    print('a')
-                if event.key == pygame.K_d:
-                    print('d')
-                if event.key == pygame.K_SPACE:
-                    print('space')
-                if event.key == pygame.K_ESCAPE:
-                    self.active = False
-                    self.gameState = gameState.QUIT
-                    quit()
+        if event == userEvent.QUIT: #never happen, it is handled in EventHandler
+            quit()
+        elif event == userEvent.CLICKED_HIGHER:
+            pass
+        elif event == userEvent.CLICKED_LOWER:
+            pass
+        elif event == userEvent.PAUSE:
+            pass
+        elif event == userEvent.RESUME:
+            pass
+
+
+
+
+        
+
                 
 
 
 
-game = Game()
+game = GameManager()
 
 while game.active:
     game.Update()
