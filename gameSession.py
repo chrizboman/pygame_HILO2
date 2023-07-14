@@ -1,4 +1,4 @@
-from components.PData import Prompt, ImportCalories
+from utils.PData import Prompt, ImportCalories
 import random
 
 class GameSession:
