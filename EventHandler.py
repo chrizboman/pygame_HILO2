@@ -13,9 +13,11 @@ class userEvent(Enum):
     RESUME = 2
     CLICKED_HIGHER = 3
     CLICKED_LOWER = 4
+    DEBUG_ANIM = 9
+    START = 10
 
 
-class gameState(Enum):
+class GameState(Enum):
     INIT = 0
     START = 1
     RUNNING = 2
@@ -24,17 +26,17 @@ class gameState(Enum):
     PAUSED = 5
     QUIT = 6
 
-userEvent.CLICKED_HIGHER
+# userEvent.CLICKED_HIGHER
 
 class EventManager:
-
+    menuShowing = False
     currentUserEvent : userEvent = None
 
     def CheckUserEvents(self):
         pass
 
 
-    def HandleNewEvents(self, gameState:gameState):
+    def HandleNewEvents(self, gameState:GameState):
         for event in pygame.event.get(): 
             if event.type == pygame.QUIT:
                 self.userEvent = userEvent.QUIT
@@ -71,7 +73,7 @@ class EventManager:
                     self.userEvent = userEvent.QUIT
                     quit()
 
-                if _gameState == gameState.RUNNING:
+                if _gameState == GameState.RUNNING:
                     if event.key == pygame.K_h:
                         print('higher_key')
                         return userEvent.CLICKED_HIGHER
@@ -81,6 +83,22 @@ class EventManager:
 
                 if event.key == pygame.K_SPACE:
                     print('space')
+                    print(pygame.mouse.get_pos())
+                
+                if event.key == pygame.K_e:
+                    print('e')
+                    return userEvent.DEBUG_ANIM
+                if event.key == pygame.K_p:
+                    print('p')
+                    if self.menuShowing:
+                        self.menuShowing = False
+                        return userEvent.RESUME
+                    else:
+                        self.menuShowing = True
+                        return userEvent.PAUSE
+                if event.key == pygame.K_SPACE:
+                    print('space')
+                    return userEvent.START
             
 
                 

@@ -9,6 +9,9 @@ class COLOR:
     BLUE = (0, 0, 255)
     BLUE_AUTOLIV = (0, 51, 153)
     BLUE_AUTOLIV2 = (0, 25, 100)
+    GRAY = (110, 110, 110)
+    LIGHT_GRAY = (150, 150, 150)
+    DARK_GRAY = (50, 50, 50)
 
 class CONSTANTS:
     MARGIN = 5

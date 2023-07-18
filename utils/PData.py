@@ -27,3 +27,7 @@ class ImportCalories:
         for i in range(20):
             prompts.append(self.calories[random.randint(0, len(self.calories))])
         return prompts
+    
+    def PromptsOne(self) -> Prompt:
+        if self.calories is None : self.ListOfCaloriesPrompts()
+        return self.calories[random.randint(0, len(self.calories))]
