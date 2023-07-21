@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import csv
 import random
 
+PROMPT_STRING = 'The amount of Calories in '
 
 @dataclass
 class Prompt:
@@ -16,7 +17,7 @@ class ImportCalories:
         with open('calories.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             for row in csv_reader:
-                caloriesPrompts.append(Prompt(row[1], row[3], source="calories.csv datatable"))
+                caloriesPrompts.append(Prompt(PROMPT_STRING + str(row[1]) + ' (' + str(row[2]) +')', row[3], source="calories.csv datatable"))
         caloriesPrompts.pop(0)
         self.calories = caloriesPrompts
         return self.calories

@@ -1,19 +1,42 @@
 import numpy as np
 import pygame
+from pygame import QUIT
 from dataclasses import dataclass
+from pygame import Vector2
 
-from utils.FONTS import *
-from utils.VARS import *
-from utils.PData import Prompt, ImportCalories
-from components.components import *
+from components.utils.FONTS import *
+from components.utils.VARS import *
+from components.utils.PData import Prompt, ImportCalories
+# from components.components import Button, Card, Collection, PauseMenu, GameObject, Text
 from gameSession import GameSession
+from GameObjects import GameObject, Button, Card, Collection, PauseMenu, Text, ScoreCard
 
 from EventHandler import EventManager, userEvent, GameState
 
-import tween
+# import tween
 
 WIDTH = 1920//2
 HEIGHT = 1080//2
+
+VCENTER = HEIGHT//2
+HCENTER = WIDTH//2
+
+OO = Vector2(0,0)
+
+CENTER = (WIDTH//2, HEIGHT//2)
+
+RCOL_WIDTH = 200
+RCOL_CENTER = (WIDTH - RCOL_WIDTH//2, VCENTER)
+
+LCOL_WIDTH = WIDTH - RCOL_WIDTH
+LCOL_HCENTER = LCOL_WIDTH//2
+LCOL_CENTER = (LCOL_HCENTER, VCENTER)
+LCOL_TCENTER = (LCOL_HCENTER, HEIGHT//4)
+LCOL_BCENTER = (LCOL_HCENTER, HEIGHT - HEIGHT//4)
+
+
+# class Components():
+#     ScoreCard = ScoreCard( (0,0), (200, HEIGHT)).MoveTo(RCOL_CENTER)
 
 
 
@@ -30,18 +53,38 @@ class GameManager:
     active = True
     gameSession = None
     eventManager = EventManager()
-    
-    component = Components()
+
+
 
     dt = 0
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Game")
 
+    GameObject.debug = True
+    GameObject.screen = screen
+
+
     gameState = GameState.INIT
 
-    def Update(self):
+    scoreCard : ScoreCard = ScoreCard(RCOL_CENTER, (RCOL_WIDTH, HEIGHT))
 
+    pauseMenu : PauseMenu = PauseMenu().Enable(False)
+
+    listPrompts = ImportCalories().Prompts20()
+
+    prompt1 = listPrompts.pop(0)
+    prompt2 = listPrompts.pop(0)
+
+    # promptCard1 : PromptCard = PromptCard(LCOL_TCENTER, (LCOL_WIDTH, HEIGHT//2), prompt1)
+    # promptCard2 : PromptCard = PromptCard(OO, (LCOL_WIDTH, HEIGHT//2), prompt2, True).MoveTo(LCOL_BCENTER)
+
+
+    
+
+
+    def Update(self):
+ 
         if self.gameState == GameState.INIT:
             print('creating new game session')
             self.gameSession = GameSession()
@@ -53,27 +96,34 @@ class GameManager:
             self.gameState = GameState.RUNNING
         
         if self.gameState == GameState.RUNNING:
-            pass
-            # self.component.promptCard.Update(self.gameSession.standingPrompt, self.gameSession.newestPrompt)
-            # self.component.scoreTable.Update(self.gameSession.score)
-            # self.gameState = GameState.ANIMATING
-        
+            for gameObject in GameObject.instances:
+                gameObject.OnUpdate(self.dt)
+            
 
-
+    text = Text(CENTER, color=COLOR.WHITE)
     def Draw(self):
         self.dt = self.clock.tick(60)/1000
-        tween.update(self.dt)
-
-        if self.gameState == GameState.RUNNING:
-            self.gameSession.standingPrompt.Draw(self.screen)
-            # self.gameSession.standingPrompt.
-            self.gameSession.newestPrompt.Draw(self.screen)
 
         self.screen.fill(COLOR.BLACK)
-        self.component.scoreTable.Draw(self.screen)
-        # self.component.promptCard.Draw(self.screen)
+
+        if self.gameState == GameState.RUNNING:
+            self.scoreCard.Draw()
+            # self.promptCard1.Draw()
+            # self.promptCard2.Draw()
+            self.gameSession.Draw()
+
+            
+
+        if self.gameState == GameState.PAUSED:
+            self.pauseMenu.Draw()
+
+
         if self.menuShow:
-            self.component.pauseMeny.Draw(self.screen)
+            pass
+            # self.component.pauseMeny.Draw(self.screen)
+        
+        self.btn = Button(CENTER+Vector2(300,0), (300, 200)).Draw()
+        self.btn = Button(CENTER, (300, 200)).Scale(.5).Draw()
         pygame.display.update()
 
 
@@ -82,17 +132,24 @@ class GameManager:
         event = self.eventManager.CheckForInput(self.gameState)
 
         if event == userEvent.QUIT: #never happen, it is handled in EventHandler
+            pygame.QUIT
             quit()
         elif event == userEvent.CLICKED_HIGHER:
-            pass
+            self.gameSession.ClickHigher()
+            
         elif event == userEvent.CLICKED_LOWER:
             pass
         elif event == userEvent.PAUSE:
-            self.menuShow = True            
+            self.pauseMenu.Enable(True)
+            self.gameState = GameState.PAUSED
+
         elif event == userEvent.RESUME:
-            self.menuShow = False
+            self.pauseMenu.Enable(False)     
+            self.gameState = GameState.RUNNING      
+
         elif event == userEvent.DEBUG_ANIM:
-            self.component.promptCard.NextPos()
+            self.gameSession.newestPrompt.Tween_AwayButtons()
+
         elif event == userEvent.START:
             self.gameState = GameState.START
 
@@ -105,6 +162,11 @@ class GameManager:
 
 def Print(msg):
     print(msg)
+
+
+
+
+
 
 
 
