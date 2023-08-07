@@ -94,9 +94,17 @@ class GameManager:
 
     print('instances' , len(GameObject.instances))
 
+
+
+
     def Update(self):
         self.dt = self.clock.tick(60)/1000
         self.scoreCard.txt_debug.text = f'{self.gameState}'
+
+        if self.gameState == GameState.START:
+            print('Start new game')
+            self.gameSession = GameSession()
+            self.gameState = GameState.RUNNING
 
         if self.gameSession :
             if self.gameSession.gameOver and ( self.gameState != GameState.GAMEOVER ):
@@ -110,10 +118,6 @@ class GameManager:
             print(len(GameObject.instances))
             self.gameState = GameState.RUNNING
 
-        if self.gameState == GameState.START:
-            print('Start new game')
-            self.gameSession = GameSession()
-            self.gameState = GameState.RUNNING
         
         if self.gameState == GameState.RUNNING:
             tween.update(self.dt)
@@ -123,6 +127,7 @@ class GameManager:
             
             for gameObject in GameObject.instances:
                 gameObject.OnUpdate(self.dt)
+                
                 
         if self.gameState == GameState.ANIMATING:
             tween.update(self.dt)
@@ -137,13 +142,14 @@ class GameManager:
         
         if self.gameState == GameState.GAMEOVER:
             pass
-            
+        
+        if GameObject.debug:
+            pygame.display.set_caption(f"FPS: {int(self.clock.get_fps())}, gamestate: {self.gameState} ")
 
         
     def Draw(self):     
 
         self.screen.fill(COLOR.BLACK)
-        
 
         if self.gameState == GameState.RUNNING:
             self.scoreCard.Draw()
@@ -160,6 +166,9 @@ class GameManager:
         if self.gameState == GameState.GAMEOVER:
             self.gameOverMenu.Enable(True)
             self.gameOverMenu.Draw()
+        
+        if self.gameState == GameState.GAMEOVER:
+            self.gameOverMenu.Draw()
 
 
         if self.menuShow:
@@ -169,10 +178,10 @@ class GameManager:
 
         # self.coll.MoveTo(pygame.mouse.get_pos())
 
-        self.btn.Draw()
-        self.coll.MoveTo(pygame.mouse.get_pos())
-        self.coll.Draw()
-        self.gameOverMenu.Draw()
+        # self.btn.Draw()
+        # # self.coll.MoveTo(pygame.mouse.get_pos())
+        # self.coll.Draw()
+        # self.gameOverMenu.Draw()
        
 
         pygame.display.update()
@@ -202,8 +211,7 @@ class GameManager:
             self.gameState = GameState.RUNNING      
 
         elif event == userEvent.DEBUG_ANIM:
-
-            self.gameSession.standingPrompt.MoveTo(Vector2(0,0))
+            self.coll.TweenTo(pygame.mouse.get_pos(), 1, 'easeInOutCubic')
             pass
             
         
@@ -211,7 +219,7 @@ class GameManager:
             self.btn.scale = 1
 
         elif event == userEvent.A:
-            pass
+            pass 
 
         elif event == userEvent.START:
             self.gameState = GameState.START
