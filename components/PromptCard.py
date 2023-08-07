@@ -1,5 +1,9 @@
 from . utils.VARS import *
 from GameObjects import *
+import tween
+import math
+from typing import Callable
+from . Animation import Animation
 
 RCOL_HCENTER = (WIDTH - 200)//2
 from enum import Enum
@@ -24,8 +28,12 @@ class PromptCard(Collection):
     showButtons : bool = False
     showAnswer : bool = False
 
+
+
+
     def __init__(self, positionCenter: Vector2, prompt : Prompt = None, showButtons : bool = False, showAnswer : bool = False):
         super().__init__(positionCenter, [])
+        self.tposition = positionCenter
 
         self.prompt = prompt
         self.showButtons = showButtons
@@ -48,7 +56,7 @@ class PromptCard(Collection):
                                          font = small_font )
                                          )
 
-        self.txt_answer = self.Add(Text(self.ANSWER_POS, 
+        self.txt_answer : Text = self.Add(Text(self.ANSWER_POS, 
                                         f'{self.prompt.answer}', 
                                         font = huge_font))
         # if self.showButtons:
@@ -69,10 +77,42 @@ class PromptCard(Collection):
             self.txt_qm.Enable(False)
             self.btn_higher.Enable(False)
             self.btn_lower.Enable(False)
+        
+    def CheckAnswerAnimation(self, onCompleteFunc: Callable):
+        self.__Tween_AwayButtons()
+        self.__Tween_ShowAnswer(delay=.5)
+        self.__Tween_NumberTo(delay=.9).on_complete(
+            onCompleteFunc
+        )
+        
+    def __Tween_AwayButtons(self):
+        # tween.to(self.btn_higher, 'position', self.btn_higher.position + Vector2(0, -100), 0.5, tween.easeOutQuad)
+        self.tween_higher = tween.to(self.btn_higher, "scale", 0, .5, 'easeInOutQuad')
+        self.tween_lower = tween.to(self.btn_lower, "scale", 0, .5, 'easeInOutQuad')
+        self.tween_qm = tween.to(self.txt_qm, "scale", 0, .5, 'easeInOutQuad')
+        self.tween_qm.on_update(lambda: self.Scale(self.scale))
 
-    def Tween_AwayButtons(self):
-        self.btn_higher.TweenTo(scale = 0, duration=1)
-        self.btn_lower.TweenTo(scale = 0, duration=1)
-        # self.txt_qm.TweenTo(self.BTN_POS, 1)
-
+    def __Tween_ShowAnswer(self, delay : float = 0.0):
+        self.txt_answer.Enable(True)
+        self.txt_answer.Scale(0)
+        self.tween_answer = tween.to(self.txt_answer, "scale", 1, .5, 'easeInOutQuad', delay=delay)
+        self.tween_answer.on_update(lambda: self.Scale(self.scale))
+        return self.tween_answer
+    
+    def __Tween_NumberTo(self, value = None, duration = 1.0, delay : float = 0.0):
+        if not value:
+            value = int( self.prompt.answer)
+        self.txt_answer.Enable(True)
+        self.txt_answer.text = 0
+        self.tween_answer = tween.to(self.txt_answer, "text", value, duration, ease_type='easeOutQuint', delay=delay)
+        return self.tween_answer
+    
+    def TweenUP(self):
+        print('tweenuo')
+        self.uptween = tween.to(self, 'tposition', self.position - Vector2(0, WIDTH/4 + 30), 2, ease_type='easeInOutCubic')
+        self.uptween.on_update(lambda: self.MoveTo(self.tposition))
+        # self.uptween.on_update(lambda: print(self.position))
+        # self.position += Vector2(0, -WIDTH/4)
+        pass
+        
 

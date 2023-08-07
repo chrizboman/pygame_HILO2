@@ -15,6 +15,8 @@ class userEvent(Enum):
     CLICKED_LOWER = 4
     DEBUG_ANIM = 9
     START = 10
+    W = 11
+    A = 12
 
 
 class GameState(Enum):
@@ -105,6 +107,13 @@ class EventManager:
                 if event.key == pygame.K_SPACE:
                     print('space')
                     return userEvent.START
+                
+                if event.key == pygame.K_w:
+                    print('w')
+                    return userEvent.W
+                if event.key == pygame.K_a:
+                    print('a')
+                    return userEvent.A
             
 
                 

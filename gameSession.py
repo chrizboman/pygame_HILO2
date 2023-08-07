@@ -12,9 +12,11 @@ class GameSession:
     gameOver = False
     prompts : list[Prompt]
 
-    standingPrompt : PromptCard
-    newestPrompt : PromptCard
-    nextPrompt : PromptCard
+    standingPrompt : PromptCard = None
+    newestPrompt : PromptCard = None
+    nextPrompt : PromptCard = None
+
+    animationComplete = True
 
     def __init__(self) -> None:
         self.prompts = ImportCalories().Prompts20()
@@ -27,23 +29,33 @@ class GameSession:
         self.newestPrompt.Draw()
         self.nextPrompt.Draw()
     
-    def CheckAnswer(self, answeredHigher : bool ) -> bool:
-        isHigher = self.newestPrompt.prompt.answer > self.standingPrompt.prompt.answer
+    def CheckAnswer(self, answeredHigher : bool ):
+        isHigher = int(self.newestPrompt.prompt.answer) > int(self.standingPrompt.prompt.answer)
         if isHigher and answeredHigher:
-            return True
+            self.Correct()
         else :
-            return False
+            self.GameOver()
     
-    def ClickHigher(self):
-        self.newestPrompt.TweenTo((500, 500), 1).OnTweenComplete(
-            lambda : self.newestPrompt.TweenTo(PROMPCARD_POS.BOTTOM, 1).OnTweenComplete(
-                lambda : print(self.CheckAnswer(True))
-            )
+    def ClickHigher(self, higher: bool):
+        # self.newestPrompt.Tween_AwayButtons()
+        # self.newestPrompt.Tween_ShowAnswer(delay=.5)
+        # self.newestPrompt.Tween_NumberTo( delay=.9)
+        self.animationComplete = False
+        self.newestPrompt.CheckAnswerAnimation(
+            onCompleteFunc= lambda: self.CheckAnswer(higher)
         )
-        return self.CheckAnswer(True)
-    
-    def ClickLower(self):
-        return self.CheckAnswer(False)
-    
 
+        # return self.CheckAnswer(True)
+
+    def Correct(self):
+        print('correct')
+        self.score += 1
+        self.NewPrompt()
+
+    def GameOver(self):
+        print('game over')
+        self.gameOver = True
+
+    def NewPrompt(self):
+        self.newestPrompt.TweenUP()
 

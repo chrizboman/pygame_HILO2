@@ -15,25 +15,27 @@ from components.utils.PData import Prompt
 from components.utils.Tweener import Tween
 import random
 
+import tween
+
 # WIDTH = 1920//2
 # HEIGHT = 1080//2
 
 
 
-class GameObject(Tween):
+class GameObject():
     instances : list = []
     enabled = True
     debug = False
     screen = None
     scale : float = 1
     isScaled = True
+    fromCenter : Vector2
     # tweener : Tween = None
 
     def __init__(self, positionCenter : Vector2):
-        super().__init__(positionCenter)
+        # super().__init__(positionCenter)
         GameObject.instances.append(self)
         self.position : Vector2 = positionCenter
-        self.tposition : Vector2 = positionCenter
         self.size = Vector2(0,0)
         self.rect : Rect = Rect(*positionCenter, *self.size)
         self.screen = GameObject.screen
@@ -42,23 +44,29 @@ class GameObject(Tween):
         return self
 
     def MoveTo(self, positionCenter : Vector2):
-        self.tposition = positionCenter
         self.position = positionCenter
         self.rect.center = self.position
         return self
     
-    def TweenTo(self, pos: Vector2, duration: float):
-        return super().TweenTo(pos, duration)
+    # def TweenTo(self, pos: Vector2, duration: float):
+    #     return super().TweenTo(pos, duration)
 
     def OnUpdate(self, dt : float):
-        self._TweenUpdate(dt)
-        self.MoveTo(self.tposition)
         pass
 
     def Scale(self, scale : float):
         self.scale = scale
-        self.rect = self.rect.scale_by(scale)
         return self
+    
+    def TweenTo(self, pos,  duration : float, tweenType : str = "easeInOutCubic"):
+        self.tween = tween.to(self, "position", Vector2(pos), duration, tweenType)
+        self.tween.on_update(lambda: self.MoveTo(self.position))
+        # self.tween.on_update(lambda: print(self.position) )
+        return self
+    
+    def TweenScale(self, value, duration : float, tweenType : str = "easeInOutCubic" ):
+        self.tween = tween.to(self, "scale", value, duration, tweenType)
+        self.tween.on_update(lambda: self.Scale(self.scale))
 
     def Draw(self):
         if self.debug:
@@ -87,7 +95,7 @@ class GameObject(Tween):
     @property
     def y(self):
         return self.position[1]
-
+    
 
         
         
@@ -98,7 +106,7 @@ class GameObject(Tween):
 
 class Text(GameObject):
     UseAntialias = True
-    def __init__(self, positionCenter : Vector2, text : str = "TextBox", font : Font = small_font , color : pgColor= COLOR.BLACK):
+    def __init__(self, positionCenter : Vector2, text = "TextBox", font : Font = small_font , color : pgColor= COLOR.BLACK, isnumber : bool = False):
         super().__init__(positionCenter)
         self.text = text
         self.font = font
@@ -107,16 +115,19 @@ class Text(GameObject):
         self.rect = self.surface.get_rect(center = self.position)
         self.needUpdate = False
     
-
-    
     def Draw(self):
+        if type(self.text) == int or type(self.text) == float:
+            text = str ( int (self.text ))
+        else:
+            text = str(self.text)
         super().Draw()
         if (self.enabled):
-            self.surface = self.font.render(self.text, self.UseAntialias, self.color)
-            self.screen.blit(self.surface, self.rect)
-
-
-
+            self.surface = self.font.render(text, self.UseAntialias, self.color)
+            textSurface = pygame.transform.smoothscale_by(
+                self.surface, self.scale)
+            self.rect = textSurface.get_rect(center = self.position)
+            self.screen.blit(textSurface, self.rect)
+        
 
 
 class Button(GameObject):
@@ -152,25 +163,25 @@ class Button(GameObject):
         self.textRect = self.textSurface.get_rect(center = self.position)
         self.textRect.center = self.rect.center
     
-    def Scale(self, scale : float):
-        super().Scale(scale)
+    # def Scale(self, scale : float):
+    #     super().Scale(scale)
 
     def Draw(self):
-        if self.scale != 1:
-            self.Scale(self.scale)
-
+        # self.rect.center = self.position
         screen = self.screen
+        newRect = self.rect.copy()
+        newRect.scale_by_ip(self.scale)
         if (self.enabled):
             #Draw the inner background
             pygame.draw.rect(screen,
                              self.borderColor,
-                             self.rect,
+                             newRect,
                              border_radius = self.CORNER_RADIUS,
             )
             #Draw the outer border
             pygame.draw.rect(screen, 
                             self.btnClor, 
-                            self.rect, 
+                            newRect, 
                             border_radius = self.CORNER_RADIUS, 
                             width = self.BORDER_WIDTH)
             #Draw the text
@@ -247,14 +258,14 @@ class Collection(GameObject):
         return self
 
     def MoveTo(self, pos : Vector2):
-        for children in self.gameObjects:
-            distance = Vector2(children.position) - Vector2(self.position)
-            children.MoveTo((Vector2(pos) + distance ))
+        distance = Vector2( Vector2(pos) - self.position )
+        for child in self.gameObjects:
+            child.MoveTo((distance + child.position ))
         super().MoveTo(pos)
-        #     gameObject.MoveTo((Vector2(self.position) + gameObject.position ))
         return self
     
     def Draw(self):
+        self.MoveTo(self.position)
         super().Draw()
         for gameObject in self.gameObjects:
             gameObject.Draw()
@@ -266,6 +277,12 @@ class Collection(GameObject):
         for gameObject in self.gameObjects:
             gameObject.Enable(enable)
         return self
+    
+    # def Scale(self, scale: float):
+    #     super().Scale(scale)
+    #     for gameObject in self.gameObjects:
+    #         gameObject.Scale(scale)
+    #     return self
 
 
 
@@ -302,26 +319,38 @@ class PauseMenu(Collection, MENU):
 
 
 
-class RestartMenu(Collection):
+class GameOverMenu(Collection):
     CORNER_RADIUS = 10
     BACKGROUND_COLOR = COLOR.WHITE
     BORDER_COLOR = COLOR.DARK_GRAY
 
-    def __init__(self, 
-                 positionCenter : Vector2, 
-                 size : Vector2, 
-                 ):
+    POSITION = Vector2( WIDTH//2, HEIGHT//2 )
+    SIZE = Vector2( WIDTH-100, HEIGHT-100 )
+
+    def __init__(self):
+        size = self.SIZE
+        positionCenter = self.POSITION
         
         self.card = Card((0,0), size)
         self.txt_Title = Text((0,-100), "GAME OVER", font = huge_font, color = COLOR.BLACK)
+        self.txt_Score = Text((0,-20), "Score: ", font = large_font, color = COLOR.BLACK)
         self.btn_Restart : Button = Button((0,100), (100, 50), "Restart", font = small_font)
         self.btn_Quit : Button = Button((0,150), (100, 50), "Quit", font = small_font)
 
-        super().__init__(positionCenter, [self.card, self.btn_Quit, self.btn_Restart, self.txt_Title])
+        super().__init__(positionCenter, [self.card, self.txt_Score, self.btn_Quit, self.btn_Restart, self.txt_Title])
 
         self.BGcolor = self.BACKGROUND_COLOR
         self.BDcolor = self.BORDER_COLOR
         self.size = size
+
+
+    def Show(self, score : int = 0, highscore : int = 0):
+        self.txt_Score.text = f'Score: {score}'
+        self.Enable(True)
+        self.Scale(0)
+        # self.TweenScale(1, 1.5)
+        return self
+
 
 
 class ScoreCard(Collection):

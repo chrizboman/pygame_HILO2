@@ -4,8 +4,12 @@ from typing import List, Callable
 
 class Tween:
     tposition : Vector2
-    tstartPos : Vector2
-    ttargetPos : Vector2
+    tscale : float
+    tvalue : int
+
+    tstartPos : Vector2 | float
+    ttargetPos : Vector2 | float
+
     life : float = 0
     duration : float = 0
     done = True
@@ -22,11 +26,11 @@ class Tween:
         self.__onUpdate()
         if not self.done:
             self.life += dt
-            # print('life ', self.life, ' duration ', self.duration, 'is higher ', self.life >= self.duration  )
             if self.life >= self.duration:
                 self.done = True
                 self.__onComplete()
-            tween_value = self.distanceVector * pytweening.easeInOutQuad(min(1, self.life / self.duration))
+            # this should work for both Vector2 and float?
+            tween_value = self.totalTravel * pytweening.easeInOutQuad(min(1, self.life / self.duration))
             self.tposition = tween_value + self.tstartPos
             return self.tposition
         
@@ -46,38 +50,30 @@ class Tween:
             func()
             
     
-    def TweenTo(self, pos: Vector2 = None, duration: float = 1, scale : float = None, number : float = None):
+    def TweenTo(self, pos: Vector2, duration: float = 1):
+        try:
+            pos = Vector2(pos)
+        except:
+            raise TypeError('pos must be a Vector2 or a float')
         
-        # animate scale
-        if scale is not None:
-            self.__onStart()
-            pass
+        print('moving to pos ', pos)
+        self.__onStart()
+        self.done = False
+        self.tstartPos = self.tposition
+        self.duration = duration
+        self.totalTravel = pos - self.tstartPos
+        self.life = 0
+        return self
 
-        # animate number
-        elif number is not None:
-            self.__onStart()
-            pass
-
-        # animate position, x,y or Vector2
-        elif pos is not None:
-            try:
-                pos = Vector2(pos)
-            except:
-                raise Exception('TweenTo: invalid pos arguments')
-            
-            print('moving to pos ', pos)
-            self.__onStart()
-            self.done = False
-            self.tstartPos = self.tposition
-            self.ttargetPos = pos
-            self.duration = duration
-            if type(pos) == float:
-                self.ttargetPos = Vector2(pos, pos)
-            self.distanceVector = Vector2(self.ttargetPos) - Vector2(self.tstartPos)
-            self.life = 0
-            return self
-        else:
-            raise Exception('TweenTo: invalid arguments')
+    def TweenScale(self, scale: float, duration: float = 1):
+        self.__onStart()
+        self.done = False
+        self.tstartPos = self.tposition
+        self.ttargetPos = scale
+        self.duration = duration
+        self.totalTravel = self.ttargetPos - self.tstartPos
+        self.life = 0
+        return self
     
 
 
