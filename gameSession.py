@@ -34,8 +34,14 @@ class GameSession:
             self.oldPrompt.Draw()
     
     def CheckAnswer(self, answeredHigher : bool ):
+        print( ' cheching if ' + self.newestPrompt.prompt.answer + ' is higher than ' + self.standingPrompt.prompt.answer )
         isHigher = int(self.newestPrompt.prompt.answer) > int(self.standingPrompt.prompt.answer)
+        print( 'is higher? ' + str(isHigher) )
+        print( 'answered higher? ' + str(answeredHigher))
+        
         if isHigher and answeredHigher:
+            self.Correct()
+        elif not isHigher and not answeredHigher:
             self.Correct()
         else :
             self.GameOver()
@@ -58,13 +64,17 @@ class GameSession:
 
     def GameOver(self):
         print('game over')
-        self.gameOver = True
+        # self.newestPrompt.TweenScale(0,1) # scale is not impemented for a collection
+        # self.standingPrompt.TweenScale(0,1)
+        self.standingPrompt.TweenTo(PROMPCARD_POS.OFFSCREEN_TOP, .5, delay=1)
+        self.newestPrompt.TweenTo(PROMPCARD_POS.OFFSCREEN_BOTTOM, .5, delay=1)
+        self.standingPrompt.WaitForThen(1.5, lambda: self.__setattr__("gameOver", True))
 
     def NewPrompt(self):
 
         self.oldPrompt = self.standingPrompt
         self.standingPrompt = self.newestPrompt
-        self.newestPrompt = PromptCard(PROMPCARD_POS.OFFSCREEN_BOTTOM, self.prompts.pop(0))
+        self.newestPrompt = PromptCard(PROMPCARD_POS.OFFSCREEN_BOTTOM, self.prompts.pop(0), showButtons=True)
         self.newestPrompt.showButtons = True
         
         self.oldPrompt.TweenTo(PROMPCARD_POS.OFFSCREEN_TOP, 1)

@@ -1,3 +1,3 @@
-x = (5,5)
+from components.utils.PData import Prompt, ImportCalories
 
-print ( type(x) is tuple)
+

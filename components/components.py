@@ -55,16 +55,7 @@ class Text():
 
 
 
-class PromptPanel():
-    width: int
-    height: int
-    pos_x: int
-    pos_y: int
-    prompt: Text = 'Here goes the prompt'
-    answer: Text = 'Here goes the answer'
-    source: Text = 'Here goes the source'
-    btn_higher : Button = None
-    btn_lower : Button = None
+
 
 
 
@@ -89,6 +80,7 @@ class RectBox:
 class GameOverBox:
     TOP = 0.0
     size = (500, 500)
+    highscore = 0
 
     txt_GO = Text(huge_font, HCENTER, TOP + 200, COLOR.BLACK, text="Game Over")
     txt_Score = Text(small_font, HCENTER, TOP + 300, COLOR.BLACK, text="Score: " + str(0))
@@ -98,12 +90,12 @@ class GameOverBox:
 
     def SetScore(self, score: int):
         self.scoreText.UpdateText("Score: " + str(score))
+        if score > self.highscore:
+            self.highscore = score
+            self.highscoreText.UpdateText("Highscore: " + str(self.highscore))
     
     def Draw(self, screen):
         for drawable in [self.rect_BG, self.txt_GO, self.txt_Score, self.btn_restart, self.btn_quit]:
             drawable.Draw(screen)
 
 
-class Components:
-    GameOverBox = GameOverBox()
-    PromptPanel = PromptPanel()

@@ -272,10 +272,21 @@ class Collection(GameObject):
         super().MoveTo(pos)
         return self
     
-    def TweenTo(self, pos : Vector2, duration : float, tweenType : str = "easeInOutCubic"):
-        self.tweenTo = tween.to(self, "tposition", Vector2(pos), duration, tweenType)
-        self.tweenTo.on_update(lambda: self.MoveTo(self.tposition))
 
+    
+    def TweenTo(self, pos : Vector2, duration : float, tweenType : str = "easeInOutCubic", delay : float = 0):
+        self.tweenTo = tween.to(self, "tposition", Vector2(pos), duration, tweenType, delay=delay)
+        self.tweenTo.on_update(lambda: self.MoveTo(self.tposition))
+    
+    # this is not really working since it has no scale function that scales all its children
+    def TweenScale(self, value, duration: float, tweenType: str = "easeInOutCubic"):
+        self.tweenScale = tween.to(self, "scale", value, duration, tweenType)
+        self.tweenScale.on_update(lambda: self.Scale(self.scale))
+
+    #this breaks things so fuck it for now
+    # def Scale(self, scale: float):
+    #     for child in self.gameObjects:
+    #         child.Scale(scale)
     
     def Draw(self):
         self.MoveTo(self.position)
@@ -340,13 +351,15 @@ class GameOverMenu(Collection):
     POSITION = Vector2( WIDTH//2, HEIGHT//2 )
     SIZE = Vector2( WIDTH-100, HEIGHT-100 )
 
+
+
     def __init__(self):
         size = self.SIZE
         positionCenter = self.POSITION
         
         self.card = Card((0,0), size)
         self.txt_Title = Text((0,-100), "GAME OVER", font = huge_font, color = COLOR.BLACK)
-        self.txt_Score = Text((0,-20), "Score: ", font = large_font, color = COLOR.BLACK)
+        self.txt_Score = Text((0,-20), "Score: init", font = large_font, color = COLOR.BLACK)
         self.btn_Restart : Button = Button((0,100), (100, 50), "Restart", font = small_font)
         self.btn_Quit : Button = Button((0,150), (100, 50), "Quit", font = small_font)
 
@@ -357,16 +370,23 @@ class GameOverMenu(Collection):
         self.size = size
 
 
-    def Show(self, score : int = 0, highscore : int = 0):
-        self.txt_Score.text = f'Score: {score}'
-        self.Enable(True)
-        self.Scale(0)
-        # self.TweenScale(1, 1.5)
-        return self
+    # def Show(self, score : int = 0, highscore : int = 0):
+    #     self.txt_Score.text = f'Score: {score}'
+    #     self.Enable(True)
+    #     self.Scale(0)
+    #     # self.TweenScale(1, 1.5)
+    #     return self
+    
+    def SetScore(self, score: int):
+        self.txt_Score.text = "Score: " + str(score)
+        # if score > self.highscore:
+        #     self.highscore = score
+            # self.txt.UpdateText("Highscore: " + str(self.highscore))
 
 
 
 class ScoreCard(Collection):
+    score = 0
     
     def __init__(self, positionCenter: Vector2, size : Vector2):
         super().__init__(positionCenter)
@@ -378,4 +398,14 @@ class ScoreCard(Collection):
         self.txt_highscore       = self.Add( Text((0,0), 'Highscore: ', font = medium_font) )
         self.txt_highscoreNum    = self.Add( Text((0,50), f'{self.highscore}', font = huge_font))
         self.txt_debug           = self.Add( Text((0,150), 'Debug', font = small_font))
+
+    def UpdateScore(self, value : int):
+        self.score = value
+        self.txt_scoreNum.text = f'{value}'
+        return self
+    
+    def UpdateHighscore(self, value : int):
+        self.highscore = value
+        self.txt_highscoreNum.text = f'{value}'
+        return self
 

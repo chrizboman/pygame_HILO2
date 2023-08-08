@@ -47,15 +47,13 @@ pygame.init()
 
 class GameManager:
 
-    debug_animationUPPERPOS = False
-    animating = False
 
     menuShow = False
 
     active = True
     gameSession = None
+    highscore : int = 0
     eventManager = EventManager()
-
 
 
     dt = 0
@@ -63,7 +61,7 @@ class GameManager:
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Game")
 
-    GameObject.debug = True
+    # GameObject.debug = True
     GameObject.screen = screen
 
 
@@ -99,7 +97,10 @@ class GameManager:
 
     def Update(self):
         self.dt = self.clock.tick(60)/1000
-        self.scoreCard.txt_debug.text = f'{self.gameState}'
+        currentScore = self.gameSession.score if self.gameSession else 0
+        self.scoreCard.UpdateScore(currentScore)
+        self.highscore = currentScore if currentScore > self.highscore else self.highscore
+        self.scoreCard.UpdateHighscore(self.highscore)
 
         if self.gameState == GameState.START:
             print('Start new game')
@@ -110,10 +111,12 @@ class GameManager:
             if self.gameSession.gameOver and ( self.gameState != GameState.GAMEOVER ):
                 self.gameOverMenu.Show()
                 self.gameState = GameState.GAMEOVER
+                
                 return
+            
  
         if self.gameState == GameState.INIT:
-            print('creating new game session')
+            print('creating new game session') 
             self.gameSession = GameSession()
             print(len(GameObject.instances))
             self.gameState = GameState.RUNNING
@@ -143,8 +146,8 @@ class GameManager:
         if self.gameState == GameState.GAMEOVER:
             pass
         
-        if GameObject.debug:
-            pygame.display.set_caption(f"FPS: {int(self.clock.get_fps())}, gamestate: {self.gameState} ")
+        
+        pygame.display.set_caption(f"FPS: {int(self.clock.get_fps())}, gamestate: {self.gameState} ")
 
         
     def Draw(self):     
@@ -165,6 +168,7 @@ class GameManager:
         
         if self.gameState == GameState.GAMEOVER:
             self.gameOverMenu.Enable(True)
+            self.gameOverMenu.SetScore(self.gameSession.score)
             self.gameOverMenu.Draw()
         
         if self.gameState == GameState.GAMEOVER:

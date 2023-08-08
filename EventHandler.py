@@ -91,6 +91,9 @@ class EventManager:
                     if event.key == pygame.K_SPACE:
                         print('space')
                         return userEvent.START
+                    if event.key == pygame.K_r:
+                        print('r')
+                        return userEvent.START
                     
 
                 if event.key == pygame.K_SPACE:
