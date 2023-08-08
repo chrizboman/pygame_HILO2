@@ -4,6 +4,14 @@ from pygame import QUIT
 from dataclasses import dataclass
 from pygame import Vector2
 
+<<<<<<< HEAD
+
+from utils import VARS
+from utils.PData import Prompt, ImportCalories
+from components.components import GameOverBox, RectBox, Text, Button, Components
+from gameSession import GameSession
+from EventHandler import EventManager, userEvent, gameState
+=======
 from components.utils.FONTS import *
 from components.utils.VARS import *
 from components.utils.PData import Prompt, ImportCalories
@@ -12,6 +20,7 @@ from gameSession import GameSession
 from GameObjects import GameObject, Button, Card, Collection, PauseMenu, Text, ScoreCard, GameOverMenu
 
 from EventHandler import EventManager, userEvent, GameState
+>>>>>>> f6538978be78c0c42c023cf60b084678b005e280
 
 import random
 import tween
@@ -36,6 +45,12 @@ LCOL_TCENTER = (LCOL_HCENTER, HEIGHT//4)
 LCOL_BCENTER = (LCOL_HCENTER, HEIGHT - HEIGHT//4)
 
 
+<<<<<<< HEAD
+pygame.init()
+
+class GameManager:
+    components = Components()
+=======
 # class Components():
 #     ScoreCard = ScoreCard( (0,0), (200, HEIGHT)).MoveTo(RCOL_CENTER)
 
@@ -51,13 +66,18 @@ class GameManager:
     animating = False
 
     menuShow = False
+>>>>>>> f6538978be78c0c42c023cf60b084678b005e280
 
     active = True
     gameSession = None
     eventManager = EventManager()
+<<<<<<< HEAD
+    # 
+=======
 
 
 
+>>>>>>> f6538978be78c0c42c023cf60b084678b005e280
     dt = 0
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -94,9 +114,17 @@ class GameManager:
 
     print('instances' , len(GameObject.instances))
 
+
+
+
     def Update(self):
         self.dt = self.clock.tick(60)/1000
         self.scoreCard.txt_debug.text = f'{self.gameState}'
+
+        if self.gameState == GameState.START:
+            print('Start new game')
+            self.gameSession = GameSession()
+            self.gameState = GameState.RUNNING
 
         if self.gameSession :
             if self.gameSession.gameOver and ( self.gameState != GameState.GAMEOVER ):
@@ -110,10 +138,6 @@ class GameManager:
             print(len(GameObject.instances))
             self.gameState = GameState.RUNNING
 
-        if self.gameState == GameState.START:
-            print('Start new game')
-            self.gameSession = GameSession()
-            self.gameState = GameState.RUNNING
         
         if self.gameState == GameState.RUNNING:
             tween.update(self.dt)
@@ -123,6 +147,7 @@ class GameManager:
             
             for gameObject in GameObject.instances:
                 gameObject.OnUpdate(self.dt)
+                
                 
         if self.gameState == GameState.ANIMATING:
             tween.update(self.dt)
@@ -137,13 +162,19 @@ class GameManager:
         
         if self.gameState == GameState.GAMEOVER:
             pass
-            
+        
+        if GameObject.debug:
+            pygame.display.set_caption(f"FPS: {int(self.clock.get_fps())}, gamestate: {self.gameState} ")
 
         
     def Draw(self):     
 
+<<<<<<< HEAD
+    def Draw(self):
+        self.screen.fill(VARS.BLACK)
+        self.components.GameOverBox.Draw(self.screen)  
+=======
         self.screen.fill(COLOR.BLACK)
-        
 
         if self.gameState == GameState.RUNNING:
             self.scoreCard.Draw()
@@ -160,6 +191,9 @@ class GameManager:
         if self.gameState == GameState.GAMEOVER:
             self.gameOverMenu.Enable(True)
             self.gameOverMenu.Draw()
+        
+        if self.gameState == GameState.GAMEOVER:
+            self.gameOverMenu.Draw()
 
 
         if self.menuShow:
@@ -169,12 +203,13 @@ class GameManager:
 
         # self.coll.MoveTo(pygame.mouse.get_pos())
 
-        self.btn.Draw()
-        self.coll.MoveTo(pygame.mouse.get_pos())
-        self.coll.Draw()
-        self.gameOverMenu.Draw()
+        # self.btn.Draw()
+        # # self.coll.MoveTo(pygame.mouse.get_pos())
+        # self.coll.Draw()
+        # self.gameOverMenu.Draw()
        
 
+>>>>>>> f6538978be78c0c42c023cf60b084678b005e280
         pygame.display.update()
 
 
@@ -202,8 +237,7 @@ class GameManager:
             self.gameState = GameState.RUNNING      
 
         elif event == userEvent.DEBUG_ANIM:
-
-            self.gameSession.standingPrompt.MoveTo(Vector2(0,0))
+            self.coll.TweenTo(pygame.mouse.get_pos(), 1, 'easeInOutCubic')
             pass
             
         
@@ -211,7 +245,7 @@ class GameManager:
             self.btn.scale = 1
 
         elif event == userEvent.A:
-            pass
+            pass 
 
         elif event == userEvent.START:
             self.gameState = GameState.START

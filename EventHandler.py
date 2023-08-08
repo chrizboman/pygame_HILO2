@@ -86,6 +86,12 @@ class EventManager:
                     if event.key == pygame.K_l:
                         print('lower_key')
                         return userEvent.CLICKED_LOWER
+                
+                if _gameState == GameState.GAMEOVER:
+                    if event.key == pygame.K_SPACE:
+                        print('space')
+                        return userEvent.START
+                    
 
                 if event.key == pygame.K_SPACE:
                     print('space')

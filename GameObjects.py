@@ -30,6 +30,7 @@ class GameObject():
     scale : float = 1
     isScaled = True
     fromCenter : Vector2
+    dummy : int = 0
     # tweener : Tween = None
 
     def __init__(self, positionCenter : Vector2):
@@ -67,6 +68,11 @@ class GameObject():
     def TweenScale(self, value, duration : float, tweenType : str = "easeInOutCubic" ):
         self.tween = tween.to(self, "scale", value, duration, tweenType)
         self.tween.on_update(lambda: self.Scale(self.scale))
+
+    def WaitForThen(self, duration : float, func : callable):
+        self.tween = tween.to(self, "dummy", 0, duration, "linear")
+        self.tween.on_complete(func)
+        return self
 
     def Draw(self):
         if self.debug:
@@ -238,8 +244,10 @@ class MENU():
 
 class Collection(GameObject):
     
+    
     def __init__(self, positionCenter: Vector2, gameObjects : list[GameObject] = []):
         super().__init__(positionCenter)
+        self.tposition = Vector2(positionCenter)
         self.gameObjects : list[GameObject] = gameObjects
 
         for child in self.gameObjects:
@@ -263,6 +271,11 @@ class Collection(GameObject):
             child.MoveTo((distance + child.position ))
         super().MoveTo(pos)
         return self
+    
+    def TweenTo(self, pos : Vector2, duration : float, tweenType : str = "easeInOutCubic"):
+        self.tweenTo = tween.to(self, "tposition", Vector2(pos), duration, tweenType)
+        self.tweenTo.on_update(lambda: self.MoveTo(self.tposition))
+
     
     def Draw(self):
         self.MoveTo(self.position)

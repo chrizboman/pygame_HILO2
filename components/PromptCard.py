@@ -11,7 +11,8 @@ from enum import Enum
 class PROMPCARD_POS():
     TOP = (RCOL_HCENTER, HEIGHT//4)
     BOTTOM = (RCOL_HCENTER, HEIGHT//4*3)
-    OFFSCREEN = (RCOL_HCENTER, HEIGHT + 200)
+    OFFSCREEN_TOP = (RCOL_HCENTER, -150 )
+    OFFSCREEN_BOTTOM = (RCOL_HCENTER, HEIGHT + 200)
 
 
 
@@ -109,7 +110,7 @@ class PromptCard(Collection):
     
     def TweenUP(self):
         print('tweenuo')
-        self.uptween = tween.to(self, 'tposition', self.position - Vector2(0, WIDTH/4 + 30), 2, ease_type='easeInOutCubic')
+        self.uptween = tween.to(self, 'tposition', self.position - Vector2(0, WIDTH/4 + 30), 1, ease_type='easeInOutCubic')
         self.uptween.on_update(lambda: self.MoveTo(self.tposition))
         # self.uptween.on_update(lambda: print(self.position))
         # self.position += Vector2(0, -WIDTH/4)
