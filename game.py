@@ -4,14 +4,6 @@ from pygame import QUIT
 from dataclasses import dataclass
 from pygame import Vector2
 
-<<<<<<< HEAD
-
-from utils import VARS
-from utils.PData import Prompt, ImportCalories
-from components.components import GameOverBox, RectBox, Text, Button, Components
-from gameSession import GameSession
-from EventHandler import EventManager, userEvent, gameState
-=======
 from components.utils.FONTS import *
 from components.utils.VARS import *
 from components.utils.PData import Prompt, ImportCalories
@@ -20,7 +12,6 @@ from gameSession import GameSession
 from GameObjects import GameObject, Button, Card, Collection, PauseMenu, Text, ScoreCard, GameOverMenu
 
 from EventHandler import EventManager, userEvent, GameState
->>>>>>> f6538978be78c0c42c023cf60b084678b005e280
 
 import random
 import tween
@@ -45,12 +36,6 @@ LCOL_TCENTER = (LCOL_HCENTER, HEIGHT//4)
 LCOL_BCENTER = (LCOL_HCENTER, HEIGHT - HEIGHT//4)
 
 
-<<<<<<< HEAD
-pygame.init()
-
-class GameManager:
-    components = Components()
-=======
 # class Components():
 #     ScoreCard = ScoreCard( (0,0), (200, HEIGHT)).MoveTo(RCOL_CENTER)
 
@@ -66,18 +51,13 @@ class GameManager:
     animating = False
 
     menuShow = False
->>>>>>> f6538978be78c0c42c023cf60b084678b005e280
 
     active = True
     gameSession = None
     eventManager = EventManager()
-<<<<<<< HEAD
-    # 
-=======
 
 
 
->>>>>>> f6538978be78c0c42c023cf60b084678b005e280
     dt = 0
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -169,11 +149,6 @@ class GameManager:
         
     def Draw(self):     
 
-<<<<<<< HEAD
-    def Draw(self):
-        self.screen.fill(VARS.BLACK)
-        self.components.GameOverBox.Draw(self.screen)  
-=======
         self.screen.fill(COLOR.BLACK)
 
         if self.gameState == GameState.RUNNING:
@@ -209,7 +184,6 @@ class GameManager:
         # self.gameOverMenu.Draw()
        
 
->>>>>>> f6538978be78c0c42c023cf60b084678b005e280
         pygame.display.update()
 
 

@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-from utils.PData import Prompt, ImportCalories
-=======
 from components.utils.PData import Prompt, ImportCalories
 # from components.components import PromptCard
->>>>>>> f6538978be78c0c42c023cf60b084678b005e280
 import random
 # from GameObjects import PromptCard, PROMPCARD_POS
 from components.utils.VARS import *
