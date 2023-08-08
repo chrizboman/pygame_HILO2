@@ -13,9 +13,13 @@ class userEvent(Enum):
     RESUME = 2
     CLICKED_HIGHER = 3
     CLICKED_LOWER = 4
+    DEBUG_ANIM = 9
+    START = 10
+    W = 11
+    A = 12
 
 
-class gameState(Enum):
+class GameState(Enum):
     INIT = 0
     START = 1
     RUNNING = 2
@@ -24,38 +28,42 @@ class gameState(Enum):
     PAUSED = 5
     QUIT = 6
 
-userEvent.CLICKED_HIGHER
+# userEvent.CLICKED_HIGHER
 
 class EventManager:
-
+    menuShowing = False
     currentUserEvent : userEvent = None
 
     def CheckUserEvents(self):
         pass
 
 
-    def HandleNewEvents(self, gameState:gameState):
-        for event in pygame.event.get(): 
-            if event.type == pygame.QUIT:
-                self.userEvent = userEvent.QUIT
-                quit()
+    # def HandleNewEvents(self, gameState:GameState):
+    #     for event in pygame.event.get(): 
+    #         if event.type == pygame.QUIT:
+    #             self.userEvent = userEvent.QUIT
+    #             quit()
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_a:
-                    print('a')
-                if event.key == pygame.K_h:
-                    print('higher_key')
-                    self.currentUserEvent = userEvent.CLICKED_HIGHER
-                if event.key == pygame.K_l:
-                    print('lower_key')
-                    self.currentUserEvent = userEvent.CLICKED_LOWER
-                if event.key == pygame.K_SPACE:
-                    print('space')
+    #         if event.type == pygame.KEYDOWN:
+    #             if event.key == pygame.K_a:
+    #                 print('a')
+    #             elif event.key == pygame.K_q:
+    #                 print('q')
+    #                 self.userEvent = userEvent.QUIT
+    #             elif event.key == pygame.K_h:
+    #                 print('higher_key')
+    #                 self.currentUserEvent = userEvent.CLICKED_HIGHER
+    #             if event.key == pygame.K_l:
+    #                 print('lower_key')
+    #                 self.currentUserEvent = userEvent.CLICKED_LOWER
+    #             if event.key == pygame.K_SPACE:
+    #                 print('space')
                 
-                if event.key == pygame.K_ESCAPE:
-                    # self.userEvents.append(userEvent.QUIT)
-                    self.userEvent = userEvent.QUIT
-                    quit()
+    #             if event.key == pygame.K_ESCAPE:
+    #                 print('esc')
+    #                 self.userEvent = userEvent.QUIT
+    #                 quit()
+
 
 
     def CheckForInput(self, _gameState) -> userEvent:
@@ -66,21 +74,52 @@ class EventManager:
 
             if event.type == pygame.KEYDOWN:
             
-                if event.key == pygame.K_ESCAPE:
+                if event.key == pygame.K_ESCAPE or event.key == pygame.K_q:
                     # self.userEvents.append(userEvent.QUIT)
                     self.userEvent = userEvent.QUIT
                     quit()
 
-                if _gameState == gameState.RUNNING:
+                if _gameState == GameState.RUNNING:
                     if event.key == pygame.K_h:
                         print('higher_key')
                         return userEvent.CLICKED_HIGHER
                     if event.key == pygame.K_l:
                         print('lower_key')
                         return userEvent.CLICKED_LOWER
+                
+                if _gameState == GameState.GAMEOVER:
+                    if event.key == pygame.K_SPACE:
+                        print('space')
+                        return userEvent.START
+                    
 
                 if event.key == pygame.K_SPACE:
                     print('space')
+                    print(pygame.mouse.get_pos())
+                
+                if event.key == pygame.K_e:
+                    print('e')
+                    return userEvent.DEBUG_ANIM
+                
+                if event.key == pygame.K_p:
+                    print('p')
+                    if self.menuShowing:
+                        self.menuShowing = False
+                        return userEvent.RESUME
+                    else:
+                        self.menuShowing = True
+                        return userEvent.PAUSE
+                    
+                if event.key == pygame.K_SPACE:
+                    print('space')
+                    return userEvent.START
+                
+                if event.key == pygame.K_w:
+                    print('w')
+                    return userEvent.W
+                if event.key == pygame.K_a:
+                    print('a')
+                    return userEvent.A
             
 
                 
