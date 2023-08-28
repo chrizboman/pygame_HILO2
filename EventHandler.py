@@ -6,6 +6,19 @@ from dataclasses import dataclass
 
 
 # userEvent = Enum('UserEvents', ['QUIT', 'PAUSE', 'RESUME', 'CLICKED_HIGHER', 'CLICKED_LOWER'])
+#
+# 
+#  keys allowed in the main menu name selection
+ALLOWED_NAME_KEYS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j','k','l','m','n','o','p','q','r','s','t','u','v', 'w', 'x', 'y', 'z', 'BACKSPACE', 'SPACE', 'PERIOD']
+allowedPyKeys = [getattr(pygame, 'K_' + key) for key in ALLOWED_NAME_KEYS]
+
+swedishKeys = {
+    'å' : 229,
+    'ä' : 228,
+    'ö' : 246, }
+
+# allowedPyKeys.extend(swedishKeys.values())
+
 
 class userEvent(Enum):
     QUIT = 0
@@ -15,12 +28,14 @@ class userEvent(Enum):
     CLICKED_LOWER = 4
     DEBUG_ANIM = 9
     START = 10
+    TYPING = 11
     W = 11
     A = 12
 
 
 class GameState(Enum):
-    INIT = 0
+    INIT = -1
+    MAINMENU = 0
     START = 1
     RUNNING = 2
     GAMEOVER = 3
@@ -34,37 +49,6 @@ class EventManager:
     menuShowing = False
     currentUserEvent : userEvent = None
 
-    def CheckUserEvents(self):
-        pass
-
-
-    # def HandleNewEvents(self, gameState:GameState):
-    #     for event in pygame.event.get(): 
-    #         if event.type == pygame.QUIT:
-    #             self.userEvent = userEvent.QUIT
-    #             quit()
-
-    #         if event.type == pygame.KEYDOWN:
-    #             if event.key == pygame.K_a:
-    #                 print('a')
-    #             elif event.key == pygame.K_q:
-    #                 print('q')
-    #                 self.userEvent = userEvent.QUIT
-    #             elif event.key == pygame.K_h:
-    #                 print('higher_key')
-    #                 self.currentUserEvent = userEvent.CLICKED_HIGHER
-    #             if event.key == pygame.K_l:
-    #                 print('lower_key')
-    #                 self.currentUserEvent = userEvent.CLICKED_LOWER
-    #             if event.key == pygame.K_SPACE:
-    #                 print('space')
-                
-    #             if event.key == pygame.K_ESCAPE:
-    #                 print('esc')
-    #                 self.userEvent = userEvent.QUIT
-    #                 quit()
-
-
 
     def CheckForInput(self, _gameState) -> userEvent:
         for event in pygame.event.get(): 
@@ -74,10 +58,11 @@ class EventManager:
 
             if event.type == pygame.KEYDOWN:
             
-                if event.key == pygame.K_ESCAPE or event.key == pygame.K_q:
+                if event.key == pygame.K_ESCAPE:
                     # self.userEvents.append(userEvent.QUIT)
-                    self.userEvent = userEvent.QUIT
                     quit()
+                    return userEvent.QUIT
+
 
                 if _gameState == GameState.RUNNING:
                     if event.key == pygame.K_h:
@@ -88,13 +73,31 @@ class EventManager:
                         return userEvent.CLICKED_LOWER
                 
                 if _gameState == GameState.GAMEOVER:
-                    if event.key == pygame.K_SPACE:
-                        print('space')
-                        return userEvent.START
                     if event.key == pygame.K_r:
                         print('r')
                         return userEvent.START
+                    if event.key == pygame.K_q:
+                        print('q')
+                        return userEvent.QUIT
+                
+                if _gameState == GameState.MAINMENU:
+
+                    if event.key == pygame.K_RETURN:
+                        return userEvent.START
                     
+                    if event.key in allowedPyKeys:
+                        # print('event.key', event.key)
+                        return userEvent.TYPING, pygame.key.name(event.key)
+                    
+                    if event.unicode in swedishKeys.keys():
+                        print('unicode', event.unicode)
+                        return userEvent.TYPING, event.unicode
+                    
+                    if event.key == pygame.K_1:
+                        print('key_1')
+                        return userEvent.START
+                    
+
 
                 if event.key == pygame.K_SPACE:
                     print('space')

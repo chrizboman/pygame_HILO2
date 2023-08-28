@@ -20,11 +20,14 @@ class GameSession:
 
     animationComplete = True
 
-    def __init__(self) -> None:
+    def __init__(self, mixer) -> None:
         self.prompts = ImportCalories().Prompts20()
-        self.standingPrompt = PromptCard(PROMPCARD_POS.TOP, self.prompts.pop(0), showAnswer=True)
-        self.newestPrompt = PromptCard(PROMPCARD_POS.BOTTOM, self.prompts.pop(0), showButtons=True)
+        self.standingPrompt = PromptCard(PROMPCARD_POS.OFFSCREEN_BOTTOM, self.prompts.pop(0), showAnswer=True)
+        self.newestPrompt = PromptCard(PROMPCARD_POS.OFFSCREEN_BOTTOM, self.prompts.pop(0), showButtons=True)
         # self.nextPrompt = PromptCard(PROMPCARD_POS.OFFSCREEN_BOTTOM, self.prompts.pop(0))
+        self.standingPrompt.TweenTo(PROMPCARD_POS.TOP, 1)
+        self.newestPrompt.TweenTo(PROMPCARD_POS.BOTTOM, 1)
+        self.mixer = mixer
     
     def Draw(self):
         self.standingPrompt.Draw()
@@ -34,10 +37,7 @@ class GameSession:
             self.oldPrompt.Draw()
     
     def CheckAnswer(self, answeredHigher : bool ):
-        print( ' cheching if ' + self.newestPrompt.prompt.answer + ' is higher than ' + self.standingPrompt.prompt.answer )
         isHigher = int(self.newestPrompt.prompt.answer) > int(self.standingPrompt.prompt.answer)
-        print( 'is higher? ' + str(isHigher) )
-        print( 'answered higher? ' + str(answeredHigher))
         
         if isHigher and answeredHigher:
             self.Correct()
@@ -58,17 +58,21 @@ class GameSession:
         # return self.CheckAnswer(True)
 
     def Correct(self):
-        print('correct')
+        print('---correct---')
         self.score += 1
         self.NewPrompt()
+        self.mixer.PlaySound('correct')
 
     def GameOver(self):
-        print('game over')
+        self.mixer.PlaySound('wrong')
+        print('✝✝✝ game over ✝✝✝')
         # self.newestPrompt.TweenScale(0,1) # scale is not impemented for a collection
         # self.standingPrompt.TweenScale(0,1)
         self.standingPrompt.TweenTo(PROMPCARD_POS.OFFSCREEN_TOP, .5, delay=1)
         self.newestPrompt.TweenTo(PROMPCARD_POS.OFFSCREEN_BOTTOM, .5, delay=1)
         self.standingPrompt.WaitForThen(1.5, lambda: self.__setattr__("gameOver", True))
+        
+
 
     def NewPrompt(self):
 

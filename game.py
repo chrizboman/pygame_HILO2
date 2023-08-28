@@ -1,4 +1,5 @@
 import numpy as np
+import json
 import pygame
 from pygame import QUIT
 from dataclasses import dataclass
@@ -7,17 +8,20 @@ from pygame import Vector2
 from components.utils.FONTS import *
 from components.utils.VARS import *
 from components.utils.PData import Prompt, ImportCalories
+from components.NameEditor import NameEditor
 # from components.components import Button, Card, Collection, PauseMenu, GameObject, Text
 from gameSession import GameSession
-from GameObjects import GameObject, Button, Card, Collection, PauseMenu, Text, ScoreCard, GameOverMenu
+from GameObjects import GameObject, Button, Card, Collection, PauseMenu, Text, ScoreCard, GameOverMenu, StartMenu
 
 from EventHandler import EventManager, userEvent, GameState
 
 import random
 import tween
 
-WIDTH = 1920//2
-HEIGHT = 1080//2
+scale = .5
+
+WIDTH = 1920 *scale
+HEIGHT = 1080 * scale
 
 VCENTER = HEIGHT//2
 HCENTER = WIDTH//2
@@ -26,7 +30,7 @@ OO = Vector2(0,0)
 
 CENTER = (WIDTH//2, HEIGHT//2)
 
-RCOL_WIDTH = 200
+RCOL_WIDTH = 400 * scale
 RCOL_CENTER = (WIDTH - RCOL_WIDTH//2, VCENTER)
 
 LCOL_WIDTH = WIDTH - RCOL_WIDTH
@@ -39,14 +43,95 @@ LCOL_BCENTER = (LCOL_HCENTER, HEIGHT - HEIGHT//4)
 # class Components():
 #     ScoreCard = ScoreCard( (0,0), (200, HEIGHT)).MoveTo(RCOL_CENTER)
 
+# HighScores = {
+#     'Player1' : 0,
+#     'Player2' : 0,
+# }
+
+#MUSIC________________
+
+pygame.mixer.init()
+pygame.mixer.music.load('assets/music/menu.mp3')
 
 
-test = ImportCalories().Prompts20()
+class HighScores:
+    path = 'data/highscores.json'
+    playerHighScores = {}
+
+    def __init__(self) -> None:
+        self.Load()
+        
+    def Load(self):
+        with open(self.path) as json_file:
+            self.playerHighScores = json.load(json_file)
+
+    def Save(self):
+        with open(self.path, "w") as outfile:
+            json.dump(self.playerHighScores, outfile)
+        
+    def Add(self, playerName, score):
+        if playerName in self.playerHighScores:
+            if score > self.playerHighScores[playerName]:
+                self.playerHighScores[playerName] = score
+        else:
+            self.playerHighScores[playerName] = score        
+        
+        self.Sort()
+        self.Save()
+
+    def Sort(self):
+        self.playerHighScores = dict(sorted(self.playerHighScores.items(), key=lambda item: item[1], reverse=True))
+    
+
+class Mixer:
+    # correct = pygame.mixer.Sound('assets/sounds/correct.wav')
+    # wrong = pygame.mixer.Sound('assets/sounds/wrong.wav')
+    # gameOver = pygame.mixer.Sound('assets/sounds/gameOver.wav')
+    correct = pygame.mixer.Sound('assets/sounds/bell.wav')
+    wrong = pygame.mixer.Sound('assets/sounds/failure.wav')
+    gameOver = pygame.mixer.Sound('assets/sounds/gameOver.mp3')
+    click = pygame.mixer.Sound('assets/sounds/click.mp3')
+    start = pygame.mixer.Sound('assets/sounds/explosion.wav')
+
+    def __init__(self):
+        pygame.mixer.init()
+    
+    def PlayMusic(self, music : str):
+        self.playing = music
+        if music == 'menu':
+            pygame.mixer.music.load('assets/music/menu.mp3')
+            pygame.mixer.music.play()
+        elif music == 'playing':
+            pygame.mixer.music.load('assets/music/play.mp3')
+            pygame.mixer.music.play()
+
+    def PlaySound(self, sound : str):
+        if sound == 'correct':
+            self.correct.play()
+        elif sound == 'wrong':
+            self.wrong.play()
+        elif sound == 'gameOver':
+            self.gameOver.play()
+        elif sound == 'click':
+            self.click.play()
+        elif sound == 'start':
+            self.start.play()
+        
+    def Stop(self):
+        pygame.mixer.music.fadeout(1000)
+
+        
+
+# test = ImportCalories().Prompts20()
 
 pygame.init()
 
 class GameManager:
 
+    mixer = Mixer()
+    mixer.PlayMusic('menu')
+
+    highScores = HighScores()
 
     menuShow = False
 
@@ -65,12 +150,14 @@ class GameManager:
     GameObject.screen = screen
 
 
-    gameState = GameState.INIT
+    gameState = GameState.MAINMENU
 
     scoreCard : ScoreCard = ScoreCard(RCOL_CENTER, (RCOL_WIDTH, HEIGHT))
 
     pauseMenu : PauseMenu = PauseMenu().Enable(False)
     gameOverMenu : GameOverMenu = GameOverMenu().Enable(False)
+
+    startMenuTemp = StartMenu().Enable(True)
 
     listPrompts = ImportCalories().Prompts20()
 
@@ -92,40 +179,35 @@ class GameManager:
 
     print('instances' , len(GameObject.instances))
 
+    nameEditor : NameEditor = NameEditor()
 
 
 
     def Update(self):
+        pygame.display.set_caption(f"FPS: {int(self.clock.get_fps())}, gamestate: {self.gameState}, playing as: {self.nameEditor.playerName}, lat. usr. event: {self.lastEvent}", )
         self.dt = self.clock.tick(60)/1000
+
         currentScore = self.gameSession.score if self.gameSession else 0
         self.scoreCard.UpdateScore(currentScore)
         self.highscore = currentScore if currentScore > self.highscore else self.highscore
         self.scoreCard.UpdateHighscore(self.highscore)
+        self.scoreCard.UpdateName(self.nameEditor.playerName)
+        self.scoreCard.LoadLeaderboard(self.highScores.playerHighScores)
+
 
         if self.gameState == GameState.START:
-            print('Start new game')
-            self.gameSession = GameSession()
+            if self.gameSession:
+                self.gameSession.gameOver = False
+            print('Starting new game')
+            self.gameSession = GameSession(self.mixer)         
             self.gameState = GameState.RUNNING
-
-        if self.gameSession :
-            if self.gameSession.gameOver and ( self.gameState != GameState.GAMEOVER ):
-                self.gameOverMenu.Show()
-                self.gameState = GameState.GAMEOVER
-                
-                return
-            
- 
-        if self.gameState == GameState.INIT:
-            print('creating new game session') 
-            self.gameSession = GameSession()
-            print(len(GameObject.instances))
-            self.gameState = GameState.RUNNING
+            pass
 
         
         if self.gameState == GameState.RUNNING:
             tween.update(self.dt)
             if self.gameSession.gameOver:
-                self.gameState = GameState.GAMEOVER
+                self.GameOver()
                 return
             
             for gameObject in GameObject.instances:
@@ -139,25 +221,31 @@ class GameManager:
             if self.gameSession.animationComplete:
                 self.gameSession.animationComplete = False
                 self.gameState = GameState.RUNNING
+            
             if self.gameSession.gameOver:
-                self.gameState = GameState.GAMEOVER
+                self.GameOver()
                 return
         
         if self.gameState == GameState.GAMEOVER:
             pass
         
         
-        pygame.display.set_caption(f"FPS: {int(self.clock.get_fps())}, gamestate: {self.gameState} ")
+
+        
+
 
         
     def Draw(self):     
 
         self.screen.fill(COLOR.BLACK)
 
+        if self.gameState == GameState.MAINMENU:
+            self.startMenuTemp.txt_name.text = self.nameEditor.playerName
+            self.startMenuTemp.Draw()
+
         if self.gameState == GameState.RUNNING:
             self.scoreCard.Draw()
             self.gameSession.Draw()
-            
                     
         if self.gameState == GameState.ANIMATING:
             self.gameSession.Draw()
@@ -174,35 +262,39 @@ class GameManager:
         if self.gameState == GameState.GAMEOVER:
             self.gameOverMenu.Draw()
 
-
-        if self.menuShow:
-            pass
-            # self.component.pauseMeny.Draw(self.screen)
-        # self.gameSession.Draw()
-
-        # self.coll.MoveTo(pygame.mouse.get_pos())
-
-        # self.btn.Draw()
-        # # self.coll.MoveTo(pygame.mouse.get_pos())
-        # self.coll.Draw()
-        # self.gameOverMenu.Draw()
-       
+        # self.scoreCard.TweenTo(pygame.mouse.get_pos(), 0.1)
+        # self.startMenuTemp.Draw()
 
         pygame.display.update()
 
-
     
+
+
+
+    lastEvent = None
     def HandleEvents(self):
         event = self.eventManager.CheckForInput(self.gameState)
+        if event : self.lastEvent = event
+        
+        if isinstance(event, tuple):
+            # has sent a TYPING with a data string
+            char = event[1]
+            self.nameEditor.InputChar(char)
 
         if event == userEvent.QUIT: #never happen, it is handled in EventHandler
-            pygame.QUIT
-            quit()
+            self.gameState = GameState.MAINMENU
+            self.mixer.PlayMusic('menu')
+            self.nameEditor = NameEditor()
+            self.gameSession = None
+            print('quit')
+
         elif event == userEvent.CLICKED_HIGHER:
+            self.mixer.PlaySound('click')
             self.gameState = GameState.ANIMATING
             self.gameSession.ClickHigher(True)
             
         elif event == userEvent.CLICKED_LOWER:
+            self.mixer.PlaySound('click')
             self.gameState = GameState.ANIMATING
             self.gameSession.ClickHigher(False)
 
@@ -215,10 +307,9 @@ class GameManager:
             self.gameState = GameState.RUNNING      
 
         elif event == userEvent.DEBUG_ANIM:
-            self.coll.TweenTo(pygame.mouse.get_pos(), 1, 'easeInOutCubic')
+            self.scoreCard.TweenTo(Vector2(random.randint(0, WIDTH), random.randint(0, HEIGHT) ), 5)
             pass
             
-        
         elif event == userEvent.W:
             self.btn.scale = 1
 
@@ -227,14 +318,17 @@ class GameManager:
 
         elif event == userEvent.START:
             self.gameState = GameState.START
+            self.mixer.PlayMusic('playing')
+            self.mixer.PlaySound('start')
 
 
-
-    def NotAnimating(self):
-        self.animating = False
-
-
-
+    def GameOver(self):
+        self.gameState = GameState.GAMEOVER
+        self.gameOverMenu.SetName(self.nameEditor.playerName)
+        self.highScores.Add(self.nameEditor.playerName, self.gameSession.score)
+        self.mixer.Stop()
+        self.mixer.PlaySound('gameOver')
+        return
 
 
 
