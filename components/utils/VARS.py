@@ -12,6 +12,7 @@ class COLOR:
     GRAY = (110, 110, 110)
     LIGHT_GRAY = (150, 150, 150)
     DARK_GRAY = (50, 50, 50)
+    PINK = (255, 0, 255)
 
 class CONSTANTS:
     MARGIN = 5

@@ -3,7 +3,7 @@ from GameObjects import *
 import tween
 import math
 from typing import Callable
-from . Animation import Animation
+# from . Animation import Animation
 
 RCOL_HCENTER = (WIDTH - 200)//2
 from enum import Enum
@@ -48,13 +48,15 @@ class PromptCard(Collection):
         self.btn_higher = self.Add(Button(
                                         self.BTN_POS - self.BTN_DIST, 
                                         self.BTN_SIZE, "Higher", 
-                                        font = small_font)
+                                        font = small_font,
+                                        btnColor=COLOR.GREEN,)
                                         )
         self.btn_lower = self.Add(Button(
                                         self.BTN_POS + self.BTN_DIST,
                                          self.BTN_SIZE, 
                                          "Lower", 
-                                         font = small_font )
+                                         font = small_font,
+                                          btnColor=COLOR.PINK, )
                                          )
 
         self.txt_answer : Text = self.Add(Text(self.ANSWER_POS, 

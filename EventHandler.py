@@ -62,6 +62,12 @@ class EventManager:
                     # self.userEvents.append(userEvent.QUIT)
                     quit()
                     return userEvent.QUIT
+                
+                if event.key == pygame.K_F13:
+                    print('F12')
+                if event.key == pygame.K_F14:
+                    print('F14')
+                    
 
 
                 if _gameState == GameState.RUNNING:
@@ -71,6 +77,12 @@ class EventManager:
                     if event.key == pygame.K_l:
                         print('lower_key')
                         return userEvent.CLICKED_LOWER
+                    if event.key == pygame.K_F13:
+                        print('F13')
+                        return userEvent.CLICKED_HIGHER
+                    if event.key == pygame.K_F14:
+                        print('F14')
+                        return userEvent.CLICKED_LOWER
                 
                 if _gameState == GameState.GAMEOVER:
                     if event.key == pygame.K_r:
@@ -78,6 +90,14 @@ class EventManager:
                         return userEvent.START
                     if event.key == pygame.K_q:
                         print('q')
+                        return userEvent.QUIT
+                    
+                    if event.key == pygame.K_F13:
+                        print('F13')
+                        return userEvent.START
+                    
+                    if event.key == pygame.K_F14:
+                        print('F14')
                         return userEvent.QUIT
                 
                 if _gameState == GameState.MAINMENU:
@@ -93,19 +113,10 @@ class EventManager:
                         print('unicode', event.unicode)
                         return userEvent.TYPING, event.unicode
                     
-                    if event.key == pygame.K_1:
-                        print('key_1')
+                    if event.key == pygame.K_F13:
+                        print('F13')
                         return userEvent.START
                     
-
-
-                if event.key == pygame.K_SPACE:
-                    print('space')
-                    print(pygame.mouse.get_pos())
-                
-                if event.key == pygame.K_e:
-                    print('e')
-                    return userEvent.DEBUG_ANIM
                 
                 if event.key == pygame.K_p:
                     print('p')

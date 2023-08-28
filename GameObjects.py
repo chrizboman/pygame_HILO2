@@ -354,8 +354,6 @@ class GameOverMenu(Collection):
     POSITION = Vector2( WIDTH//2, HEIGHT//2 )
     SIZE = Vector2( WIDTH-100, HEIGHT-100 )
 
-
-
     def __init__(self):
         size = self.SIZE
         positionCenter = self.POSITION
@@ -363,8 +361,8 @@ class GameOverMenu(Collection):
         self.card = Card((0,0), size)
         self.txt_Title = Text((0,-100), "GAME OVER", font = huge_font, color = COLOR.BLACK)
         self.txt_Score = Text((0,-20), "Score: init", font = large_font, color = COLOR.BLACK)
-        self.btn_Restart : Button = Button((0,100), (300, 50), "Continue Playing as ", font = small_font)
-        self.btn_Quit : Button = Button((0,150), (300, 50), "Quit to main menu", font = small_font)
+        self.btn_Restart : Button = Button  ((170, 150), (300, 50), "Continue Playing as ", font = small_font, btnColor=COLOR.GREEN, txtColor=COLOR.BLACK)
+        self.btn_Quit : Button = Button     ((-170 ,150), (300, 50), "Quit to main menu", font = small_font, btnColor=COLOR.PINK, txtColor=COLOR.BLACK)
 
         super().__init__(positionCenter, [self.card, self.txt_Score, self.btn_Quit, self.btn_Restart, self.txt_Title])
 
@@ -442,7 +440,7 @@ class StartMenu(Collection):
     BORDER_COLOR = COLOR.DARK_GRAY
 
     POSITION = Vector2( WIDTH//2, HEIGHT//2 )
-    SIZE = Vector2( WIDTH-100, HEIGHT-100 )
+    SIZE = Vector2( WIDTH-20, HEIGHT-20 )
 
     def __init__(self):
         size = self.SIZE
@@ -452,13 +450,16 @@ class StartMenu(Collection):
         self.txt_title = Text((0,-150), "The Higher or Lower Game", font = very_large_font, color = COLOR.BLACK)
         self.txt_playingAs = Text((0,-80), "Playing as: ", font = small_font, color = COLOR.BLACK)
         self.txt_name = Text((0, 0 ), "-", font = large_font, color = COLOR.BLACK)
-        self.txt_enterName = Text((0,100), "Enter your name and press Yellow to start", font = medium_font, color = COLOR.BLACK)
+        self.txt_enterName = Text((0,100), "Enter your name on the keyboard and press green to start", font = medium_font, color = COLOR.BLACK)
 
-        self.btn_Start : Button = Button((0,150), (300, 50), "Press Yellow to Start", font = small_font)
+        self.btn_Start : Button = Button((0,200), (300, 50), "Play as: --", font = small_font, btnColor=COLOR.GREEN, txtColor=COLOR.BLACK )
 
-        super().__init__(positionCenter, [self.card, self.txt_enterName, self.txt_playingAs, self.txt_name, self.btn_Start, self.txt_title])
+        super().__init__(positionCenter, [self.card, self.txt_enterName, self.txt_playingAs, self.btn_Start, self.txt_name, self.txt_title])
 
         self.BGcolor = self.BACKGROUND_COLOR
         self.BDcolor = self.BORDER_COLOR
         self.size = size
 
+    def UpdateName(self, name : str):
+        self.btn_Start.text = "Play as: " + name
+        return self

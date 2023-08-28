@@ -9,6 +9,7 @@ from components.utils.FONTS import *
 from components.utils.VARS import *
 from components.utils.PData import Prompt, ImportCalories
 from components.NameEditor import NameEditor
+from components.PlayerData import *
 # from components.components import Button, Card, Collection, PauseMenu, GameObject, Text
 from gameSession import GameSession
 from GameObjects import GameObject, Button, Card, Collection, PauseMenu, Text, ScoreCard, GameOverMenu, StartMenu
@@ -40,61 +41,21 @@ LCOL_TCENTER = (LCOL_HCENTER, HEIGHT//4)
 LCOL_BCENTER = (LCOL_HCENTER, HEIGHT - HEIGHT//4)
 
 
-# class Components():
-#     ScoreCard = ScoreCard( (0,0), (200, HEIGHT)).MoveTo(RCOL_CENTER)
-
-# HighScores = {
-#     'Player1' : 0,
-#     'Player2' : 0,
-# }
-
-#MUSIC________________
-
-pygame.mixer.init()
-pygame.mixer.music.load('assets/music/menu.mp3')
 
 
-class HighScores:
-    path = 'data/highscores.json'
-    playerHighScores = {}
 
-    def __init__(self) -> None:
-        self.Load()
-        
-    def Load(self):
-        with open(self.path) as json_file:
-            self.playerHighScores = json.load(json_file)
 
-    def Save(self):
-        with open(self.path, "w") as outfile:
-            json.dump(self.playerHighScores, outfile)
-        
-    def Add(self, playerName, score):
-        if playerName in self.playerHighScores:
-            if score > self.playerHighScores[playerName]:
-                self.playerHighScores[playerName] = score
-        else:
-            self.playerHighScores[playerName] = score        
-        
-        self.Sort()
-        self.Save()
 
-    def Sort(self):
-        self.playerHighScores = dict(sorted(self.playerHighScores.items(), key=lambda item: item[1], reverse=True))
-    
 
 class Mixer:
-    # correct = pygame.mixer.Sound('assets/sounds/correct.wav')
-    # wrong = pygame.mixer.Sound('assets/sounds/wrong.wav')
-    # gameOver = pygame.mixer.Sound('assets/sounds/gameOver.wav')
-    correct = pygame.mixer.Sound('assets/sounds/bell.wav')
-    wrong = pygame.mixer.Sound('assets/sounds/failure.wav')
-    gameOver = pygame.mixer.Sound('assets/sounds/gameOver.mp3')
-    click = pygame.mixer.Sound('assets/sounds/click.mp3')
-    start = pygame.mixer.Sound('assets/sounds/explosion.wav')
 
     def __init__(self):
         pygame.mixer.init()
+        self.correct = pygame.mixer.Sound('assets/sounds/bell.wav')
+        self.wrong = pygame.mixer.Sound('assets/sounds/failure.wav')
+        self.gameOver = pygame.mixer.Sound('assets/sounds/gameOver.mp3')
+        self.click = pygame.mixer.Sound('assets/sounds/click.mp3')
+        self.start = pygame.mixer.Sound('assets/sounds/explosion.wav')
     
     def PlayMusic(self, music : str):
         self.playing = music
@@ -139,7 +100,6 @@ class GameManager:
     gameSession = None
     highscore : int = 0
     eventManager = EventManager()
-
 
     dt = 0
     clock = pygame.time.Clock()
@@ -228,6 +188,9 @@ class GameManager:
         
         if self.gameState == GameState.GAMEOVER:
             pass
+
+        if self.gameState == GameState.MAINMENU:
+            self.startMenuTemp.UpdateName(str(self.nameEditor.playerName))
         
         
 
