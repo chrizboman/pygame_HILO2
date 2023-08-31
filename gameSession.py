@@ -1,4 +1,4 @@
-from components.utils.PData import Prompt, ImportCalories
+from components.utils.PData import Prompt, ImportAutolivQuestions
 # from components.components import PromptCard
 import random
 # from GameObjects import PromptCard, PROMPCARD_POS
@@ -21,7 +21,8 @@ class GameSession:
     animationComplete = True
 
     def __init__(self, mixer) -> None:
-        self.prompts = ImportCalories().Prompts20()
+        self.prompts = ImportAutolivQuestions().RandomQuestions(50)
+
         self.standingPrompt = PromptCard(PROMPCARD_POS.OFFSCREEN_BOTTOM, self.prompts.pop(0), showAnswer=True)
         self.newestPrompt = PromptCard(PROMPCARD_POS.OFFSCREEN_BOTTOM, self.prompts.pop(0), showButtons=True)
         # self.nextPrompt = PromptCard(PROMPCARD_POS.OFFSCREEN_BOTTOM, self.prompts.pop(0))

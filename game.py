@@ -19,28 +19,18 @@ from EventHandler import EventManager, userEvent, GameState
 import random
 import tween
 
-scale = .5
+scale = 1
 
-WIDTH = 1920 *scale
-HEIGHT = 1080 * scale
-
-VCENTER = HEIGHT//2
-HCENTER = WIDTH//2
 
 OO = Vector2(0,0)
 
-CENTER = (WIDTH//2, HEIGHT//2)
 
-RCOL_WIDTH = 400 * scale
-RCOL_CENTER = (WIDTH - RCOL_WIDTH//2, VCENTER)
 
 LCOL_WIDTH = WIDTH - RCOL_WIDTH
 LCOL_HCENTER = LCOL_WIDTH//2
 LCOL_CENTER = (LCOL_HCENTER, VCENTER)
 LCOL_TCENTER = (LCOL_HCENTER, HEIGHT//4)
 LCOL_BCENTER = (LCOL_HCENTER, HEIGHT - HEIGHT//4)
-
-
 
 
 
@@ -93,6 +83,7 @@ class GameManager:
     mixer.PlayMusic('menu')
 
     highScores = HighScores()
+    highScoresNew = HighScoresNew()
 
     menuShow = False
 
@@ -103,7 +94,7 @@ class GameManager:
 
     dt = 0
     clock = pygame.time.Clock()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
     pygame.display.set_caption("Game")
 
     # GameObject.debug = True
@@ -289,16 +280,10 @@ class GameManager:
         self.gameState = GameState.GAMEOVER
         self.gameOverMenu.SetName(self.nameEditor.playerName)
         self.highScores.Add(self.nameEditor.playerName, self.gameSession.score)
+        self.highScoresNew.Add(self.nameEditor.playerName, self.gameSession.score)
         self.mixer.Stop()
         self.mixer.PlaySound('gameOver')
         return
-
-
-
-
-
-
-
 
 
 

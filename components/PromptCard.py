@@ -5,23 +5,29 @@ import math
 from typing import Callable
 # from . Animation import Animation
 
-RCOL_HCENTER = (WIDTH - 200)//2
+# RCOL_HCENTER = (WIDTH - 200)//2
+
+
+
+
+
+
 from enum import Enum
 
 class PROMPCARD_POS():
-    TOP = (RCOL_HCENTER, HEIGHT//4)
-    BOTTOM = (RCOL_HCENTER, HEIGHT//4*3)
-    OFFSCREEN_TOP = (RCOL_HCENTER, -150 )
-    OFFSCREEN_BOTTOM = (RCOL_HCENTER, HEIGHT + 200)
+    TOP = (LCOL_HCENTER, HEIGHT//4)
+    BOTTOM = (LCOL_HCENTER, HEIGHT//4*3)
+    OFFSCREEN_TOP = (LCOL_HCENTER, - HEIGHT/4 )
+    OFFSCREEN_BOTTOM = (LCOL_HCENTER, HEIGHT * 5/4)
 
 
 
 class PromptCard(Collection):
-    SIZE = (WIDTH-200, HEIGHT//2)
+    SIZE = (LCOL_WIDTH, HEIGHT//2)
 
-    BTN_SIZE = (100, 50)
-    BTN_POS = (0, 40)
-    BTN_DIST = Vector2(-70, 0)
+    BTN_SIZE = (250, 120)
+    BTN_POS = (0, 70)
+    BTN_DIST = Vector2(-250, 0)
 
     PROMPT_POS = (0, -80)
     ANSWER_POS = (0, 40)
@@ -40,23 +46,26 @@ class PromptCard(Collection):
         self.showButtons = showButtons
         self.showAnswer = showAnswer
         self.card = self.Add(Card((0,0), self.SIZE))
-        self.txt_prompt = self.Add(Text(self.PROMPT_POS, self.prompt.prompt, font = large_font))
-        self.txt_is = self.Add(Text((0,-40), 'are', font = medium_font))
-        self.txt_source = self.Add(Text((-250,100), self.prompt.source, font = small_font))
-        self.txt_qm = self.Add(Text(self.BTN_POS, '?', font = medium_font))
+        self.txt_prompt = self.Add(Text(    (0,-200), self.prompt.prompt, font = prompt_font))
+        self.txt_is = self.Add(Text(        (0,-100), 'answer:', font = small_font))
+        self.txt_source = self.Add(Text(    (-LCOL_HCENTER +50 ,200), 'source: ' + self.prompt.source, font = small_font_mono,  justify = 'left'))
+        #place the source.left to the left
+        self.txt_qm = self.Add(Text(self.BTN_POS, '?', font = question_mark))
         
         self.btn_higher = self.Add(Button(
                                         self.BTN_POS - self.BTN_DIST, 
                                         self.BTN_SIZE, "Higher", 
                                         font = small_font,
-                                        btnColor=COLOR.GREEN,)
+                                        btnColor=COLOR.GREEN,
+                                        txtColor=COLOR.BLACK,)
                                         )
         self.btn_lower = self.Add(Button(
                                         self.BTN_POS + self.BTN_DIST,
                                          self.BTN_SIZE, 
                                          "Lower", 
-                                         font = small_font,
-                                          btnColor=COLOR.PINK, )
+                                        font = small_font,
+                                        btnColor=COLOR.PINK,
+                                        txtColor=COLOR.BLACK, )
                                          )
 
         self.txt_answer : Text = self.Add(Text(self.ANSWER_POS, 
@@ -64,12 +73,14 @@ class PromptCard(Collection):
                                         font = huge_font))
         # if self.showButtons:
         if self.showButtons:
+            self.txt_is.text = 'this answer is:'
             self.txt_answer.Enable(False)
             self.txt_qm.Enable(True)
             self.btn_higher.Enable(True)
             self.btn_lower.Enable(True)
 
         if self.showAnswer:
+            self.txt_is.text = 'answer:'
             self.txt_answer.Enable(True)
             self.txt_qm.Enable(False)
             self.btn_higher.Enable(False)

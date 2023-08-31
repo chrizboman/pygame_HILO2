@@ -35,3 +35,31 @@ class ImportCalories:
     def PromptsOne(self) -> Prompt:
         if self.calories is None : self.ListOfCaloriesPrompts()
         return self.calories[random.randint(0, len(self.calories))]
+
+
+
+path = 'data/frågor.csv'
+
+class ImportAutolivQuestions():
+    questions = None
+
+    def __init__(self) -> None:
+        with open(path) as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=';')
+            questions = []
+            for row in csv_reader:
+                question, answer, source = row[0], row[1], row[2]
+                if source != "" and question != "" and answer != "":
+                    questions.append(Prompt(question, answer, source=source))
+            self.questions = questions
+        print(f'Imported {len(self.questions)} questions from {path}')
+    
+    def RandomQuestions(self, number : int) -> list[Prompt]:
+        if self.questions is None : self.__init__()
+        prompts = []
+        questions_copy = self.questions.copy()
+        for i in range(number):
+            randomint = random.randint(0, len(questions_copy) -1)
+            # print('popping', randomint, 'from', len(questions_copy)-1)
+            prompts.append(questions_copy.pop(randomint))
+        return prompts

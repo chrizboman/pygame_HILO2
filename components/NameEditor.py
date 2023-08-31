@@ -19,6 +19,15 @@ class NameEditor():
         else:
             self.__Add(char.upper())
 
+    def FormatWhenDone(self):
+        if self.playerName == '':
+            self.playerName = 'Guest'
+        #remove spaces at the end and beginning
+        self.playerName = self.playerName.strip()
+        self.playerName = self.playerName.replace(' ', '·')
+        
+        return self.playerName
+
     
     def __Remove(self):
         self.playerName = self.playerName[:-1]

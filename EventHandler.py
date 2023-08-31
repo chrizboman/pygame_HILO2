@@ -107,7 +107,10 @@ class EventManager:
                     
                     if event.key in allowedPyKeys:
                         # print('event.key', event.key)
-                        return userEvent.TYPING, pygame.key.name(event.key)
+                        if event.key == pygame.K_SPACE:
+                            return userEvent.TYPING, '·'
+                        else:
+                            return userEvent.TYPING, pygame.key.name(event.key)
                     
                     if event.unicode in swedishKeys.keys():
                         print('unicode', event.unicode)
