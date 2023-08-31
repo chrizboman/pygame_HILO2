@@ -365,10 +365,10 @@ class GameOverMenu(Collection):
         positionCenter = self.POSITION
         
         self.card = Card((0,0), size)
-        self.txt_Title = Text((0,-100), "GAME OVER", font = huge_font, color = COLOR.BLACK)
-        self.txt_Score = Text((0,-20), "Score: init", font = large_font, color = COLOR.BLACK)
+        self.txt_Title = Text((0,-150), "GAME OVER", font = huge_font, color = COLOR.BLACK)
+        self.txt_Score = Text((0,0), "Score: init", font = large_font, color = COLOR.BLACK)
         self.btn_Restart : Button = Button  ((self.BTN_DIST, 300), self.BTN_SIZE, "Restart as ", font = small_font, btnColor=COLOR.GREEN, txtColor=COLOR.BLACK)
-        self.btn_Quit : Button = Button     ((self.BTN_DIST, 300), self.BTN_SIZE, "Quit to main menu", font = small_font, btnColor=COLOR.PINK, txtColor=COLOR.BLACK)
+        self.btn_Quit : Button = Button     ((-self.BTN_DIST, 300), self.BTN_SIZE, "Quit to main menu", font = small_font, btnColor=COLOR.PINK, txtColor=COLOR.BLACK)
 
         super().__init__(positionCenter, [self.card, self.txt_Score, self.btn_Quit, self.btn_Restart, self.txt_Title])
 

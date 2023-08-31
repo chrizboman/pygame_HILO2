@@ -35,6 +35,12 @@ class PromptCard(Collection):
     showButtons : bool = False
     showAnswer : bool = False
 
+    is_upperPos = Vector2(0, -200)
+    is_lowerPos = Vector2(0, -100)
+
+    question_upperPos = Vector2(0, -200)
+    question_lowerPos = Vector2(0, -150)
+
 
 
 
@@ -47,14 +53,14 @@ class PromptCard(Collection):
         self.showAnswer = showAnswer
         self.card = self.Add(Card((0,0), self.SIZE))
         self.txt_prompt = self.Add(Text(    (0,-200), self.prompt.prompt, font = prompt_font))
-        self.txt_is = self.Add(Text(        (0,-100), 'answer:', font = small_font))
-        self.txt_source = self.Add(Text(    (-LCOL_HCENTER +50 ,200), 'source: ' + self.prompt.source, font = small_font_mono,  justify = 'left'))
+        self.txt_is = self.Add(Text(        (0,-100), 'är:', font = small_font))
+        self.txt_source = self.Add(Text(    (-LCOL_HCENTER +50 ,200), 'Källa: ' + self.prompt.source, font = small_font_mono,  justify = 'left'))
         #place the source.left to the left
         self.txt_qm = self.Add(Text(self.BTN_POS, '?', font = question_mark))
         
         self.btn_higher = self.Add(Button(
                                         self.BTN_POS - self.BTN_DIST, 
-                                        self.BTN_SIZE, "Higher", 
+                                        self.BTN_SIZE, "Högre", 
                                         font = small_font,
                                         btnColor=COLOR.GREEN,
                                         txtColor=COLOR.BLACK,)
@@ -62,7 +68,7 @@ class PromptCard(Collection):
         self.btn_lower = self.Add(Button(
                                         self.BTN_POS + self.BTN_DIST,
                                          self.BTN_SIZE, 
-                                         "Lower", 
+                                         "Lägre", 
                                         font = small_font,
                                         btnColor=COLOR.PINK,
                                         txtColor=COLOR.BLACK, )
@@ -73,14 +79,18 @@ class PromptCard(Collection):
                                         font = huge_font))
         # if self.showButtons:
         if self.showButtons:
-            self.txt_is.text = 'this answer is:'
+            self.txt_is.text = 'ÄR'
+            self.txt_is.MoveTo((self.is_upperPos) + self.position)
+            self.txt_prompt.MoveTo(self.question_lowerPos+self.position)
             self.txt_answer.Enable(False)
             self.txt_qm.Enable(True)
             self.btn_higher.Enable(True)
             self.btn_lower.Enable(True)
 
         if self.showAnswer:
-            self.txt_is.text = 'answer:'
+            self.txt_is.text = 'ÄR:'
+            self.txt_is.MoveTo(self.is_lowerPos+self.position)
+            self.txt_prompt.MoveTo(self.question_upperPos+self.position)
             self.txt_answer.Enable(True)
             self.txt_qm.Enable(False)
             self.btn_higher.Enable(False)

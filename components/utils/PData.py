@@ -44,8 +44,8 @@ class ImportAutolivQuestions():
     questions = None
 
     def __init__(self) -> None:
-        with open(path) as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=';')
+        with open(path, encoding='utf-8') as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=';', )
             questions = []
             for row in csv_reader:
                 question, answer, source = row[0], row[1], row[2]

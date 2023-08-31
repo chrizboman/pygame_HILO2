@@ -32,20 +32,21 @@ class HighScoresNew:
             json.dump(self.playerHighScores, outfile)
         
     def Add(self, playerClass):
-        playerName = playerClass.playerName
-        score = playerClass.highscore
+        # playerName = playerClass.playerName
+        # score = playerClass.highscore
 
-        for existing_player in self.playerHighScores:
-            if existing_player.playerName == playerClass.playerName:
-                if score > player.highscore:
-                    player.highscore = score
-                player.tries += 1
-                player.lastTry = datetime.now()
-                self.Sort()
-                self.Save()
-                return
-        # if not in list
-        self.playerHighScores.append(Player(playerName, score, 1, datetime.now()))
+        # for existing_player in self.playerHighScores:
+        #     if existing_player.playerName == playerClass.playerName:
+        #         if score > player.highscore:
+        #             player.highscore = score
+        #         player.tries += 1
+        #         player.lastTry = datetime.now()
+        #         self.Sort()
+        #         self.Save()
+        #         return
+        # # if not in list
+        # self.playerHighScores.append(Player(playerName, score, 1, datetime.now()))
+        pass
 
     def Sort(self):
         pass

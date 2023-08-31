@@ -26,15 +26,6 @@ OO = Vector2(0,0)
 
 
 
-LCOL_WIDTH = WIDTH - RCOL_WIDTH
-LCOL_HCENTER = LCOL_WIDTH//2
-LCOL_CENTER = (LCOL_HCENTER, VCENTER)
-LCOL_TCENTER = (LCOL_HCENTER, HEIGHT//4)
-LCOL_BCENTER = (LCOL_HCENTER, HEIGHT - HEIGHT//4)
-
-
-
-
 
 
 class Mixer:
@@ -46,6 +37,8 @@ class Mixer:
         self.gameOver = pygame.mixer.Sound('assets/sounds/gameOver.mp3')
         self.click = pygame.mixer.Sound('assets/sounds/click.mp3')
         self.start = pygame.mixer.Sound('assets/sounds/explosion.wav')
+
+        self.allSounds = [self.correct, self.wrong, self.gameOver, self.click, self.start]
     
     def PlayMusic(self, music : str):
         self.playing = music
@@ -67,9 +60,13 @@ class Mixer:
             self.click.play()
         elif sound == 'start':
             self.start.play()
-        
+                                 
     def Stop(self):
         pygame.mixer.music.fadeout(1000)
+    
+    def Volume(self, volume : float):
+        pygame.mixer.music.set_volume(volume)
+        [pygame.mixer.Sound.set_volume(sound, volume) for sound in self.allSounds]
 
         
 
@@ -81,6 +78,7 @@ class GameManager:
 
     mixer = Mixer()
     mixer.PlayMusic('menu')
+    
 
     highScores = HighScores()
     highScoresNew = HighScoresNew()
@@ -97,7 +95,6 @@ class GameManager:
     screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
     pygame.display.set_caption("Game")
 
-    # GameObject.debug = True
     GameObject.screen = screen
 
 
@@ -280,7 +277,7 @@ class GameManager:
         self.gameState = GameState.GAMEOVER
         self.gameOverMenu.SetName(self.nameEditor.playerName)
         self.highScores.Add(self.nameEditor.playerName, self.gameSession.score)
-        self.highScoresNew.Add(self.nameEditor.playerName, self.gameSession.score)
+        # self.highScoresNew.Add(self.nameEditor.playerName, self.gameSession.score)
         self.mixer.Stop()
         self.mixer.PlaySound('gameOver')
         return
