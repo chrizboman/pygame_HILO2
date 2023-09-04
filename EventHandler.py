@@ -85,12 +85,12 @@ class EventManager:
                         return userEvent.CLICKED_LOWER
                 
                 if _gameState == GameState.GAMEOVER:
-                    if event.key == pygame.K_r:                     # THIAS SJHOPULD GO TOMORROW
-                        print('r')
-                        return userEvent.START
-                    if event.key == pygame.K_q:
-                        print('q')
-                        return userEvent.QUIT
+                    # if event.key == pygame.K_r:                     # THIAS SJHOPULD GO TOMORROW
+                    #     print('r')
+                    #     return userEvent.START
+                    # if event.key == pygame.K_q:
+                    #     print('q')
+                    #     return userEvent.QUIT
                     
                     if event.key == pygame.K_F13:
                         print('F13')
@@ -102,8 +102,8 @@ class EventManager:
                 
                 if _gameState == GameState.MAINMENU:
 
-                    if event.key == pygame.K_RETURN:                   # THIAS SJHOPULD GO TOMORROW
-                        return userEvent.START
+                    # if event.key == pygame.K_RETURN:                   # THIAS SJHOPULD GO TOMORROW
+                    #     return userEvent.START
                     
                     if event.key in allowedPyKeys:
                         # print('event.key', event.key)
