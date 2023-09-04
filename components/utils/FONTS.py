@@ -16,8 +16,9 @@ playername_Scoreboard = pygame.font.SysFont('bernardcondensed', 30)
 # playername_Scoreboard = pygame.font.SysFont('bauhaus93', 30)
 # Question_font = 
 
-introfont_mono = pygame.font.SysFont("FreeMono, Monospace", 100, bold=True)
-small_font_mono = pygame.font.SysFont("FreeMono, Monospace", 20, bold=True)
+introfont_mono = pygame.font.SysFont("FreeMono, Monospace", 100, bold=False)
+small_font_mono = pygame.font.SysFont("FreeMono, Monospace", 20, bold=False)
+small_font_monoEdit = pygame.font.SysFont("FreeMono, Monospace", 20, bold=True)
 
 
 if False:

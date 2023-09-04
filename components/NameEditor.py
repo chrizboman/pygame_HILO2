@@ -4,7 +4,7 @@ class NameEditor():
     __asGuest = True
     
     def __init__(self) -> None:
-        self.playerName = 'Guest'
+        self.playerName = 'Gäst'
         
     
     def InputChar(self, char: str):
@@ -21,7 +21,7 @@ class NameEditor():
 
     def FormatWhenDone(self):
         if self.playerName == '':
-            self.playerName = 'Guest'
+            self.playerName = 'Gäst'
         #remove spaces at the end and beginning
         self.playerName = self.playerName.strip()
         self.playerName = self.playerName.replace(' ', '·')

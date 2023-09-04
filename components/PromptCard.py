@@ -103,13 +103,13 @@ class PromptCard(Collection):
             self.btn_lower.Enable(False)
         
     def CheckAnswerAnimation(self, onCompleteFunc: Callable):
-        self.__Tween_AwayButtons()
+        self.Tween_AwayButtons()
         self.__Tween_ShowAnswer(delay=.5)
         self.__Tween_NumberTo(delay=.9).on_complete(
             onCompleteFunc
         )
         
-    def __Tween_AwayButtons(self):
+    def Tween_AwayButtons(self):
         # tween.to(self.btn_higher, 'position', self.btn_higher.position + Vector2(0, -100), 0.5, tween.easeOutQuad)
         self.tween_higher = tween.to(self.btn_higher, "scale", 0, .5, 'easeInOutQuad')
         self.tween_lower = tween.to(self.btn_lower, "scale", 0, .5, 'easeInOutQuad')

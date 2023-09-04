@@ -1,102 +1,49 @@
 import json
 from dataclasses import dataclass
+from collections import OrderedDict
 from datetime import datetime
-
-
-@dataclass
-class Player:
-    playerName : str
-    highscore : int
-    tries : int
-    lastTry : datetime
+import pickle 
 
 
 
-
-class HighScoresNew:
-    path = 'data/highscores_New.json'
-    playerHighScores : list[Player] = None
+class PlayerData:
+    path = 'data/playerData.json'
+    players = {}
 
     def __init__(self) -> None:
         try:
             self.Load()
         except:
-            self.playerHighScores = []
-        
-    def Load(self):
-        with open(self.path) as json_file:
-            self.playerHighScores = json.load(json_file)
-
-    def Save(self):
-        with open(self.path, "w") as outfile:
-            json.dump(self.playerHighScores, outfile)
-        
-    def Add(self, playerClass):
-        # playerName = playerClass.playerName
-        # score = playerClass.highscore
-
-        # for existing_player in self.playerHighScores:
-        #     if existing_player.playerName == playerClass.playerName:
-        #         if score > player.highscore:
-        #             player.highscore = score
-        #         player.tries += 1
-        #         player.lastTry = datetime.now()
-        #         self.Sort()
-        #         self.Save()
-        #         return
-        # # if not in list
-        # self.playerHighScores.append(Player(playerName, score, 1, datetime.now()))
-        pass
-
-    def Sort(self):
-        pass
-
+            self.players = {}
+            self.Save()
     
-    # def __iter__(self):
-    #     self.n = 0
-    #     return self
-
-    # def __next__(self):
-    #     if self.n <= self.max:
-    #         result = 2 ** self.n
-    #         self.n += 1
-    #         return result
-    #     else:
-    #         raise StopIteration
-
-
-
-
-
-
-
-class HighScores:
-    path = 'data/highscores.json'
-    playerHighScores = {}
-
-    def __init__(self) -> None:
-        try:
-            self.Load()
-        except:
-            self.playerHighScores = {}
     def Load(self):
         with open(self.path) as json_file:
-            self.playerHighScores = json.load(json_file)
-
+            self.players = json.load(json_file)
+        
     def Save(self):
         with open(self.path, "w") as outfile:
-            json.dump(self.playerHighScores, outfile)
-        
-    def Add(self, playerName, score):
-        if playerName in self.playerHighScores:
-            if score > self.playerHighScores[playerName]:
-                self.playerHighScores[playerName] = score
+            json.dump(self.players, outfile)
+    
+    def AddPlayerScore(self, playerName : str, score : int):
+        if playerName in self.players:
+            score = max(score, self.players[playerName]['score'])
+            self.players[playerName] = {
+                'score' : score,
+                'tries' : self.players[playerName]['tries'] + 1,
+                'lastTry' : datetime.now().isoformat()
+            }
         else:
-            self.playerHighScores[playerName] = score        
-        
-        self.Sort()
+            self.players[playerName] = {
+                'score' : score,
+                'tries' : 1,
+                'lastTry' : datetime.now().isoformat()
+            }
         self.Save()
 
-    def Sort(self):
-        self.playerHighScores = dict(sorted(self.playerHighScores.items(), key=lambda item: item[1], reverse=True))
-        
+
+    def HighScores(self, limit = 10):
+        sorted_data = sorted(self.players.items(), key=lambda x: (-x[1]['score'], x[1]['lastTry']), reverse=False)
+        return [(p[0], p[1]['score']) for p in sorted_data[:limit]]
+
+

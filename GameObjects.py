@@ -7,7 +7,7 @@ from typing import Callable as function
 # from GameObjects import GameObject
 
 from components.utils.FONTS import *
-from components.utils.VARS import COLOR, WIDTH, HEIGHT
+from components.utils.VARS import COLOR, WIDTH, HEIGHT, VCENTER, HCENTER, LCOL_HCENTER, LCOL_WIDTH, RCOL_WIDTH
 
 from components.utils.PData import Prompt
 
@@ -114,11 +114,12 @@ class GameObject():
 
 class Text(GameObject):
     UseAntialias = True
-    def __init__(self, positionCenter : Vector2, text = "TextBox", font : Font = small_font , color : pgColor= COLOR.BLACK, isnumber : bool = False, justify : str = "center"):
+    def __init__(self, positionCenter : Vector2, text = "TextBox", font : Font = small_font , color : pgColor= COLOR.BLACK,  justify : str = "center"):
         super().__init__(positionCenter)
         self.text = text
         self.font = font
         self.color = color
+        self.BGcolor = COLOR.WHITE
         self.justify = justify
         self.surface = self.font.render(self.text, self.UseAntialias, self.color)
         if justify == 'center':
@@ -126,6 +127,7 @@ class Text(GameObject):
         elif justify == 'left':
             self.rect = self.surface.get_rect(midleft = self.position)
         self.needUpdate = False
+
     
     def Draw(self):
         if type(self.text) == int or type(self.text) == float:
@@ -329,9 +331,9 @@ class PauseMenu(Collection, MENU):
     def __init__(self):
         
         self.card = Card((0,0), self.SIZE)
-        self.txt_Title = Text((0,-100), "PAUSED", font = huge_font)
-        self.btn_Restart : Button = Button((0,100), (100, 50), "Restart", font = small_font, btnColor=COLOR.GREEN, txtColor=COLOR.BLACK)
-        self.btn_Quit : Button = Button((0,150), (100, 50), "Quit", font = small_font, btnColor=COLOR.PINK, txtColor=COLOR.BLACK)
+        self.txt_Title = Text((0,-100), "PAUSAT", font = huge_font)
+        self.btn_Restart : Button = Button((0,100), (100, 50), "STARTA OM", font = small_font, btnColor=COLOR.GREEN, txtColor=COLOR.BLACK)
+        self.btn_Quit : Button = Button((0,150), (100, 50), "AVSLUTA", font = small_font, btnColor=COLOR.PINK, txtColor=COLOR.BLACK)
 
         super().__init__(self.POSIITON, [self.card, self.btn_Quit, self.btn_Restart, self.txt_Title])
 
@@ -366,9 +368,9 @@ class GameOverMenu(Collection):
         
         self.card = Card((0,0), size)
         self.txt_Title = Text((0,-150), "GAME OVER", font = huge_font, color = COLOR.BLACK)
-        self.txt_Score = Text((0,0), "Score: init", font = large_font, color = COLOR.BLACK)
-        self.btn_Restart : Button = Button  ((self.BTN_DIST, 300), self.BTN_SIZE, "Restart as ", font = small_font, btnColor=COLOR.GREEN, txtColor=COLOR.BLACK)
-        self.btn_Quit : Button = Button     ((-self.BTN_DIST, 300), self.BTN_SIZE, "Quit to main menu", font = small_font, btnColor=COLOR.PINK, txtColor=COLOR.BLACK)
+        self.txt_Score = Text((0,0), "Poäng: init", font = large_font, color = COLOR.BLACK)
+        self.btn_Restart : Button = Button  ((self.BTN_DIST, 300), self.BTN_SIZE, "Spela Igen som ", font = mini_font, btnColor=COLOR.GREEN, txtColor=COLOR.BLACK)
+        self.btn_Quit : Button = Button     ((-self.BTN_DIST, 300), self.BTN_SIZE, "Avsluta", font = small_font, btnColor=COLOR.PINK, txtColor=COLOR.BLACK)
 
         super().__init__(positionCenter, [self.card, self.txt_Score, self.btn_Quit, self.btn_Restart, self.txt_Title])
 
@@ -378,34 +380,34 @@ class GameOverMenu(Collection):
 
     
     def SetScore(self, score: int):
-        self.txt_Score.text = "Score: " + str(score)
+        self.txt_Score.text = "Poäng: " + str(score)
         # if score > self.highscore:
         #     self.highscore = score
             # self.txt.UpdateText("Highscore: " + str(self.highscore))
     
     def SetName(self, name):
-        self.btn_Restart.text = "Continue Playing as " + name
+        self.btn_Restart.text = "Spela igen som " + name
 
 
 
 class ScoreCard(Collection):
     score = 0
     HIGHSCORESTOSHOW = 15
-    LEADERBOARD_START = 0
-    LEADERBOARD_SPACING = 25
+    LEADERBOARD_START = 50
+    LEADERBOARD_SPACING = 30
     
     def __init__(self, positionCenter: Vector2, size : Vector2):
         super().__init__(positionCenter)
         self.score = 0
         self.highscore = 0
         self.card                = self.Add( Card((0,0), size) )
-        self.playingAs           = self.Add( Text((0,-500), 'Playing as: ', font = small_font) )
+        self.playingAs           = self.Add( Text((0,-500), 'Spelarnamn: ', font = small_font) )
         self.txt_name            = self.Add( Text((0,-450), '-', font = playername_Scoreboard) )
-        self.txt_highscore       = self.Add( Text((0,-400), 'Highscore: ', font = mini_font) )
-        self.txt_highscoreNum    = self.Add( Text((0,-360), f'{self.highscore}', font = large_font))
-        self.txt_score           = self.Add( Text((0,-300), 'Current Score: ', font = mini_font) )
-        self.txt_scoreNum        = self.Add( Text((0,-200), f'{self.score}', font = huge_font) )
-        self.txt_leaderboard     = self.Add( Text((0,-50), 'Leaderboard', font = small_font) )
+        self.txt_highscore       = self.Add( Text((0,-370), 'Högsta Poäng: ', font = mini_font) )
+        self.txt_highscoreNum    = self.Add( Text((0,-330), f'{self.highscore}', font = large_font))
+        self.txt_score           = self.Add( Text((0,-270), 'Nuvarande poäng: ', font = mini_font) )
+        self.txt_scoreNum        = self.Add( Text((0,-150), f'{self.score}', font = huge_font) )
+        self.txt_leaderboard     = self.Add( Text((0,-0), 'Ledartavla', font = small_font) )
         self.CreateEmptyLeaderboard()
 
 
@@ -427,17 +429,55 @@ class ScoreCard(Collection):
             txtItem = self.Add( Text((0, self.LEADERBOARD_START + i*self.LEADERBOARD_SPACING), f'-------------------- : -', font = small_font_mono) )
             self.leaderBoardItems.append(txtItem)
         
-    def LoadLeaderboard(self, leaderboard : dict):
-        for i, (name, score) in enumerate(leaderboard.items()):
-            name = str(name).ljust(20, '-')
-            score = str(score).ljust(3, ' ')
-            self.leaderBoardItems[i].text = f'{name} : {score}'
+    
+    def LoadLeaderboard(self, leaderboard : list):
+        if leaderboard == []:
+            return []
+        
+        leaderboard = self.__insertCurrentPlayer(leaderboard)
+
+        for i, (name, score) in enumerate(leaderboard):
+            _name = str(name).ljust(20, '-')
+            _score = str(score).ljust(3, ' ')
+            if name == self.name:
+                self.leaderBoardItems[i].text = f'{_name}  : {_score}'
+                self.leaderBoardItems[i].color = COLOR.BLUE_AUTOLIV
+                self.leaderBoardItems[i].font = small_font_monoEdit
+            else: 
+                self.leaderBoardItems[i].text = f'{_name} : {_score}'
+                self.leaderBoardItems[i].color = COLOR.BLACK
+                self.leaderBoardItems[i].font = small_font_mono
             if i >= self.HIGHSCORESTOSHOW -1:
                 break
 
     def UpdateName(self, name : str):
+        self.name = name
         self.txt_name.text = name
         return self
+
+
+    def __insertCurrentPlayer(self, leaderboard : list):
+
+        lenB = len(leaderboard)
+        # Remove all instances of the current player if current score is higher
+        [leaderboard.remove(item) for item in leaderboard if (item[0] == self.name and self.score >= item[1])]
+
+        if len(leaderboard) == lenB:
+            # If the current player is not in the leaderboard, remove the last item
+            leaderboard.pop()
+         
+        for i, (name, score) in enumerate(leaderboard):
+            if self.score >= score:
+                leaderboard.insert(i, (self.name, self.score))
+                break
+        # Sort the leaderboard by score in descending order
+        # leaderboard.sort(key=lambda x: x[1], reverse=True)
+        if len(leaderboard) != lenB:
+            leaderboard.append((self.name, self.score))
+        return leaderboard[:self.HIGHSCORESTOSHOW]
+
+
+
 
 
 
@@ -455,12 +495,12 @@ class StartMenu(Collection):
         positionCenter = self.POSITION
         
         self.card = Card((0,0), size)
-        self.txt_title = Text((0,-300), "The Higher or Lower Game", font = introfont_mono, color = COLOR.BLACK)
-        self.txt_playingAs = Text((0,-150), "Playing as: ", font = mini_font, color = COLOR.BLACK)
+        self.txt_title = Text((0,-300), "HÖGRE ELLER LÄGRE?", font = introfont_mono, color = COLOR.BLACK)
+        self.txt_playingAs = Text((0,-150), "Spela som: ", font = mini_font, color = COLOR.BLACK)
         self.txt_name = Text((0, 0 ), "-", font = large_font, color = COLOR.BLACK)
-        self.txt_enterName = Text((0,200), "Enter your name to save progres, and then press green button to start", font = small_font, color = COLOR.BLACK)
+        self.txt_enterName = Text((0,200), "Fyll i ett namn för att spara ditt poängrekord. Tryck på grön för att starta", font = small_font, color = COLOR.BLACK)
 
-        self.btn_Start : Button = Button((0,HEIGHT//2-200), (400, 80), "Play as: --", font = small_font, btnColor=COLOR.GREEN, txtColor=COLOR.BLACK )
+        self.btn_Start : Button = Button((0,HEIGHT//2-200), (500, 80), "Spela som: --", font = small_font, btnColor=COLOR.GREEN, txtColor=COLOR.BLACK )
 
         super().__init__(positionCenter, [self.card, self.txt_enterName, self.txt_playingAs, self.btn_Start, self.txt_name, self.txt_title])
 
@@ -469,5 +509,133 @@ class StartMenu(Collection):
         self.size = size
 
     def UpdateName(self, name : str):
-        self.btn_Start.text = "Play as: " + name
+        self.btn_Start.text = "Starta spel som: " + name
         return self
+    
+
+
+
+
+class StartMenuLeaderBoard(Collection):
+    CORNER_RADIUS = 10
+    BACKGROUND_COLOR = COLOR.WHITE
+    BORDER_COLOR = COLOR.DARK_GRAY
+
+    POSITION = Vector2( WIDTH//2, HEIGHT//2 )
+    SIZE = Vector2( WIDTH-20, HEIGHT-20 )
+
+    HIGHSCORESTOSHOW = 20
+    LEADERBOARD_START = -300
+    LEADERBOARD_SPACING = 40
+
+    LEADERBOARD_VPOS = 650
+    
+    LEFTHCENTER = - 300 
+
+    def __init__(self):
+        size = self.SIZE
+        positionCenter = self.POSITION
+        
+        self.card =             Card((0,0), size)
+        self.txt_title =        Text((self.LEFTHCENTER,-300), "HÖGRE ELLER LÄGRE?", font = introfont_mono, color = COLOR.BLACK)
+        self.txt_playingAs =    Text((self.LEFTHCENTER,-150), "Spela som: ", font = mini_font, color = COLOR.BLACK)
+        self.txt_name =         Text((self.LEFTHCENTER, 0 ), "-", font = large_font, color = COLOR.BLACK)
+        self.txt_enterName =    Text((self.LEFTHCENTER,200), "Fyll i ett namn för att spara ditt poängrekord. Tryck på grön för att starta", font = small_font, color = COLOR.BLACK)
+
+        self.btn_Start : Button = Button((self.LEFTHCENTER, HEIGHT//2-200), (500, 80), "Spela som: --", font = small_font, btnColor=COLOR.GREEN, txtColor=COLOR.BLACK )
+
+        super().__init__(positionCenter, [self.card, self.txt_enterName, self.txt_playingAs, self.btn_Start, self.txt_name, self.txt_title])
+
+        self.BGcolor = self.BACKGROUND_COLOR
+        self.BDcolor = self.BORDER_COLOR
+        self.size = size
+
+        self.txt_leaderboard     = self.Add( Text((self.LEADERBOARD_VPOS, -400), 'Ledartavla', font = medium_font) )
+        self.CreateEmptyLeaderboard()
+
+    def UpdateName(self, name : str):
+        self.btn_Start.text = "Starta spel som: " + name
+        return self
+    
+
+    def CreateEmptyLeaderboard(self):
+        self.leaderBoardItems = []
+        for i in range(self.HIGHSCORESTOSHOW):
+            txtItem = self.Add( Text((self.LEADERBOARD_VPOS, self.LEADERBOARD_START + i*self.LEADERBOARD_SPACING), f'{i+1}. -------------------- : -', font = small_font_mono) )
+            self.leaderBoardItems.append(txtItem)
+        
+    def LoadLeaderboard(self, leaderboard : list):
+
+        for i, (name, score) in enumerate(leaderboard):
+            name = str(name).ljust(20, '-')
+            score = str(score).ljust(3, ' ')
+            self.leaderBoardItems[i].text = f'{i+1}. {name} : {score}'
+            if i >= self.HIGHSCORESTOSHOW -1:
+                break
+
+
+
+    
+
+
+
+
+
+
+class TimerBar():
+    CD_TIME = 8
+    MAXWIDTH = 1920-400-20
+    LEFTPOS = Vector2(20, VCENTER)
+    
+    bar_rect = Rect(0,0, MAXWIDTH, 20)
+    bar_rect.midleft = LEFTPOS
+
+    fillAmount = 0
+    empty = 0
+
+    timeRunOut = False
+    
+    
+    def Draw(self):
+        self.FillBar(self.fillAmount)
+        pygame.draw.rect(GameObject.screen, self.__Color(), TimerBar.bar_rect)
+    
+    def FillBar(self, amount : float):
+        self.bar_rect.width = self.MAXWIDTH * amount
+        self.bar_rect.midleft = (self.LEFTPOS)
+
+    def StartCountDown(self, delay : int = 5, duration : int = 10, onComplete : function = lambda : None):
+        self.fillAmount = 0
+        self.countdown = None
+
+        def WhenTimerRunOut():
+            self.timeRunOut = True
+            onComplete()
+
+        def Countdown():
+            self.fillAmount = 1
+            self.countdown = tween.to(self, "fillAmount", 0, duration, ease_type='linear')
+            self.countdown.on_complete(WhenTimerRunOut)
+
+        self.wait = tween.to(self, "empty", 0, delay)
+        self.wait.on_complete(Countdown)
+
+    
+    def StopCountDown(self):
+        if self.wait != None:
+            self.wait.stop()
+        if self.countdown != None:
+            self.countdown.stop()
+       
+        self.timeRunOut = False
+    
+    def __Color(self):
+        if self.fillAmount > 0.5:
+            return COLOR.GREEN
+        elif self.fillAmount > 0.3:
+            return COLOR.YELLOW
+        else:
+            return COLOR.RED
+    
+    
+        
